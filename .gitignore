@@ -1,0 +1,93 @@
+# =========================
+# Python / Django
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+.installed.cfg
+MANIFEST
+
+# Virtual environments
+backend/venv/
+backend/.venv/
+venv/
+.venv/
+env/
+.env
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+backend/media/
+backend/staticfiles/
+backend/static/dist/
+backend/static/CACHE/
+
+# Migrations created locally during dev should still be committed; only ignore
+# auto-generated pycaches inside migrations.
+**/migrations/__pycache__/
+
+# =========================
+# Node / Frontend
+# =========================
+node_modules/
+frontend/**/dist/
+frontend/**/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Testing / Coverage
+# =========================
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+coverage.xml
+*.cover
+
+# =========================
+# Editors / OS
+# =========================
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# =========================
+# Secrets / local config
+# =========================
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# =========================
+# Cursor
+# =========================
+.cursor/plans/

@@ -1,0 +1,39 @@
+{% load static %}{% load seo_tags %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ seo_title|default:SITE_NAME }}{% endblock %} | {{ SITE_NAME }}</title>
+
+  {% include "partials/_meta.html" %}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+
+  <link rel="alternate" type="application/rss+xml" title="{{ SITE_NAME }} blog" href="{% url 'blog-feed' %}">
+
+  <link rel="stylesheet" href="{% static 'dist/styles.css' %}">
+
+  {# Site-wide Organization + WebSite JSON-LD #}
+  {% json_ld organization_schema %}
+  {% json_ld website_schema %}
+  {% if breadcrumb_schema %}{% json_ld breadcrumb_schema %}{% endif %}
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased flex flex-col">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:px-3 focus:py-2 focus:rounded focus:shadow">Skip to main content</a>
+
+  {% include "partials/_nav.html" %}
+
+  <main id="main-content" class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "partials/_footer.html" %}
+
+  <script src="{% static 'src/app.js' %}" defer></script>
+  {% block extra_body %}{% endblock %}
+</body>
+</html>

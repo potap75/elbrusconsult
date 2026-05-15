@@ -1,0 +1,40 @@
+<footer class="bg-slate-900 text-slate-300 mt-16">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+    <div>
+      <p class="text-white text-lg font-semibold">{{ SITE_NAME }}</p>
+      <p class="mt-2 text-sm leading-relaxed">{{ SITE_TAGLINE }}</p>
+      <p class="mt-4 text-sm">
+        <a class="hover:text-white" href="mailto:{{ INFO_EMAIL }}">{{ INFO_EMAIL }}</a>
+      </p>
+    </div>
+
+    <nav aria-label="Footer">
+      <p class="text-white text-sm font-semibold uppercase tracking-wide">Site</p>
+      <ul class="mt-3 space-y-2 text-sm">
+        <li><a class="hover:text-white" href="{% url 'home' %}">Home</a></li>
+        <li><a class="hover:text-white" href="{% url 'services-list' %}">Services</a></li>
+        <li><a class="hover:text-white" href="{% url 'about' %}">About</a></li>
+        <li><a class="hover:text-white" href="{% url 'blog-list' %}">Blog</a></li>
+        <li><a class="hover:text-white" href="{% url 'contact' %}">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <p class="text-white text-sm font-semibold uppercase tracking-wide">Stay in touch</p>
+      <p class="mt-3 text-sm">Monthly insights on cloud architecture and cybersecurity.</p>
+      <a class="mt-4 inline-flex items-center rounded-md bg-summit-600 px-3 py-2 text-white text-sm font-medium hover:bg-summit-700"
+         href="{% url 'newsletter-subscribe' %}">Subscribe to the newsletter</a>
+    </div>
+  </div>
+
+  <div class="border-t border-slate-800">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 text-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <p>&copy; {% now "Y" %} {{ SITE_NAME }}. All rights reserved.</p>
+      <p>
+        <a class="hover:text-white" href="{% url 'sitemap' %}">Sitemap</a>
+        <span aria-hidden="true" class="mx-2">&middot;</span>
+        <a class="hover:text-white" href="{% url 'blog-feed' %}">RSS</a>
+      </p>
+    </div>
+  </div>
+</footer>

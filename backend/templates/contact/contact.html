@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load seo_tags %}
+
+{% block extra_head %}
+  {% json_ld local_business_schema %}
+{% endblock %}
+
+{% block content %}
+  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-20">
+    <p class="text-sm font-semibold uppercase tracking-wider text-summit-700">Contact</p>
+    <h1 class="mt-2 text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">Let's work together.</h1>
+    <p class="mt-4 text-slate-600 max-w-2xl">
+      Tell us a bit about your environment and goals. We will respond with next steps,
+      typically within one business day.
+    </p>
+
+    {% if messages %}
+      <div class="mt-8 space-y-2">
+        {% for message in messages %}
+          <div class="rounded-md border border-summit-300 bg-summit-50 px-4 py-3 text-summit-900">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" action="" class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white border border-slate-200 rounded-lg p-6 shadow-sm" novalidate>
+      {% csrf_token %}
+
+      <div class="md:col-span-1">
+        <label class="block text-sm font-medium text-slate-700" for="{{ form.name.id_for_label }}">Name</label>
+        {{ form.name }}
+        {% if form.name.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.name.errors|join:", " }}</p>{% endif %}
+      </div>
+
+      <div class="md:col-span-1">
+        <label class="block text-sm font-medium text-slate-700" for="{{ form.email.id_for_label }}">Email</label>
+        {{ form.email }}
+        {% if form.email.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.email.errors|join:", " }}</p>{% endif %}
+      </div>
+
+      <div class="md:col-span-1">
+        <label class="block text-sm font-medium text-slate-700" for="{{ form.company.id_for_label }}">Company</label>
+        {{ form.company }}
+      </div>
+
+      <div class="md:col-span-1">
+        <label class="block text-sm font-medium text-slate-700" for="{{ form.subject.id_for_label }}">Subject</label>
+        {{ form.subject }}
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-slate-700" for="{{ form.message.id_for_label }}">Message</label>
+        {{ form.message }}
+        {% if form.message.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.message.errors|join:", " }}</p>{% endif %}
+      </div>
+
+      {# Honeypot - hidden from real users #}
+      <div class="hidden" aria-hidden="true">
+        {{ form.website.label_tag }}
+        {{ form.website }}
+      </div>
+
+      <div class="md:col-span-2 flex items-center justify-between">
+        <p class="text-xs text-slate-500">We never share your data.</p>
+        <button type="submit"
+                class="inline-flex items-center rounded-md bg-summit-600 px-5 py-3 text-white font-semibold hover:bg-summit-700">
+          Send message
+        </button>
+      </div>
+    </form>
+  </section>
+{% endblock %}

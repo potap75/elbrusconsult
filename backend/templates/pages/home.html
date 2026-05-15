@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <section class="relative isolate overflow-hidden bg-gradient-to-br from-summit-700 via-summit-800 to-slate-900 text-white">
+    <div class="absolute inset-0 -z-10 opacity-20 [mask-image:radial-gradient(white,transparent_70%)]"
+         aria-hidden="true">
+      <svg viewBox="0 0 800 600" class="h-full w-full" preserveAspectRatio="xMidYMid slice">
+        <path d="M0 480 L150 280 L260 360 L380 180 L500 320 L620 220 L800 360 L800 600 L0 600 Z"
+              fill="currentColor" class="text-summit-500"/>
+      </svg>
+    </div>
+
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+      <p class="text-summit-200 text-sm font-semibold uppercase tracking-wider">{{ SITE_NAME }}</p>
+      <h1 class="mt-3 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
+        Cloud engineering &amp; cybersecurity, delivered with peak precision.
+      </h1>
+      <p class="mt-6 max-w-2xl text-lg text-summit-100">
+        We help organizations design secure cloud architectures, harden their controls,
+        and respond to threats. Two decades of experience across financial services,
+        healthcare, manufacturing, and communications.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-4">
+        <a href="{% url 'schedule' %}"
+           class="inline-flex items-center rounded-md bg-white px-5 py-3 text-summit-800 font-semibold shadow hover:bg-slate-100">
+          Schedule a free evaluation
+        </a>
+        <a href="{% url 'services-list' %}"
+           class="inline-flex items-center rounded-md border border-white/30 px-5 py-3 font-semibold hover:bg-white/10">
+          Explore services
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+    <header class="max-w-2xl">
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900">Areas of expertise</h2>
+      <p class="mt-3 text-slate-600">
+        From risk assessment to recovery, we cover the full security lifecycle. Every
+        engagement is tailored to your environment, threat model, and goals.
+      </p>
+    </header>
+
+    <ul class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for service in all_services %}
+        <li class="group rounded-lg border border-slate-200 bg-white p-6 hover:border-summit-400 hover:shadow-md transition">
+          <p class="text-sm font-semibold uppercase tracking-wide text-summit-700">{{ service.icon|default:"" }}</p>
+          <h3 class="mt-2 text-lg font-semibold text-slate-900">
+            <a href="{{ service.get_absolute_url }}" class="after:absolute after:inset-0 group-hover:text-summit-700">
+              {{ service.name }}
+            </a>
+          </h3>
+          <p class="mt-2 text-sm text-slate-600">{{ service.tagline }}</p>
+        </li>
+      {% empty %}
+        <li class="text-slate-600">Service catalog coming soon.</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="bg-slate-50 border-y border-slate-200">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 grid lg:grid-cols-2 gap-12 items-start">
+      <div>
+        <h2 class="text-3xl font-bold tracking-tight text-slate-900">Why teams choose Elbrus Cloud</h2>
+        <p class="mt-4 text-slate-700">
+          Cybersecurity has never been more important. We bring the rigor of established
+          frameworks (NIST, CIS, ISO 27001) and the pragmatism of seasoned architects who
+          have built and defended systems at scale.
+        </p>
+        <ul class="mt-6 space-y-3 text-slate-700">
+          <li class="flex gap-3"><span class="text-summit-600">&#10003;</span> Senior consultants only - no junior bench billing.</li>
+          <li class="flex gap-3"><span class="text-summit-600">&#10003;</span> Cloud-native architecture (AWS, Azure, GCP) and hybrid environments.</li>
+          <li class="flex gap-3"><span class="text-summit-600">&#10003;</span> Clear, prioritized remediation plans - not just findings.</li>
+          <li class="flex gap-3"><span class="text-summit-600">&#10003;</span> Knowledge transfer baked into every engagement.</li>
+        </ul>
+      </div>
+
+      <aside class="rounded-lg bg-white border border-slate-200 p-8 shadow-sm">
+        <p class="text-sm font-semibold uppercase tracking-wide text-summit-700">Ready to start?</p>
+        <h3 class="mt-2 text-2xl font-bold text-slate-900">Get a free evaluation of your security posture.</h3>
+        <p class="mt-3 text-slate-600">
+          Tell us about your environment and we will recommend the right starting point.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="{% url 'contact' %}"
+             class="inline-flex items-center rounded-md bg-summit-600 px-4 py-2 text-white font-medium hover:bg-summit-700">
+            Contact us
+          </a>
+          <a href="{% url 'schedule' %}"
+             class="inline-flex items-center rounded-md border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-100">
+            Schedule a call
+          </a>
+        </div>
+      </aside>
+    </div>
+  </section>
+{% endblock %}

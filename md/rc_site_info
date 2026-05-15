@@ -1,0 +1,69 @@
+**Roman Consulting**  
+**Website:** [https://romanconsulting.io/](https://romanconsulting.io/)  
+**Tagline:** Consultants around the world say: security has never been more important.
+
+### Overview
+Roman Consulting is a boutique firm of IT security consultants. The team evaluates your risk of a cyber security breach and designs optimal security controls tailored to your needs.
+
+### Areas of Expertise
+1. **Risk**  
+   Consultants identify gaps between required and actual security states. They provide realistic remediation as quickly as possible.
+
+2. **Access**  
+   Identity and access management protects against hackers and insider threats. Consultants ensure only authorized employees have exactly the access needed.
+
+3. **Controls**  
+   Cyber security services help organizations protect data with tailored policies and controls. Customized policies help prevent cyberattacks.
+
+4. **Testing**  
+   Identify, treat, and report security vulnerabilities. Prioritize threats and minimize the company’s attack surface.
+
+5. **Detection**  
+   Support incident discovery and response, including threat intelligence. Design event alerting and reporting for early detection.
+
+6. **Forensics**  
+   Establish incident triage and forensics procedures. Train staff and transfer knowledge for effective operations.
+
+7. **Recovery**  
+   Ensure smooth recovery from breaches. Minimize negative impacts to reduce lasting damage.
+
+8. **Application**  
+   Secure applications through security scans, result analysis, integration of security tools, and more.
+
+### Key Services
+- Your Own AI Service
+- Risk Management
+- Application Security
+- Cost-Benefit Analysis
+- Cybersecurity Consultation
+
+**View All Services** available on the site.
+
+### About Us
+At Roman Consulting, we provide clear and concise solutions to cyber security problems. Consultants have high expertise in risk management, application security, vulnerability scanning, and penetration testing.
+
+**Experience:** Over 20 years in the industry, specializing exclusively in information security solutions and advisory.
+
+**From About Page:**  
+Cyber security protects digital systems from attacks while keeping business processes running. The firm uses best American cyber security methods (e.g., NIST), is licensed/certified/insured in the UAE and USA, and employs experts with over 20 years of experience (architects, engineers, analysts, developers).
+
+They secure applications, networks, operations, and data. Clients served across industries including financial services, healthcare, pharmaceuticals, manufacturing, utilities, and communications. Expertise covers ransomware, phishing, DDoS, cloud misconfigurations, malware, etc.
+
+**Testimonial:**  
+> *Roman is a highly skilled and one of the most adaptable Security Consultants I have had the pleasure to work with. Roman has supported CyberSecurity projects for us the past 2+ years and has been involved with Cloud Security, DevSecOps, Security Operations, Application Security, and Security Architecture. Roman has proven to be a valuable asset for every client he has supported for us and has always received positive client feedback.*  
+> — Caleb Gallagher, HireVergence
+
+### Notable Customers
+- **ING Americas**: Risk assessment, control design evaluation, and substantive testing of IT operations and security.
+- **Target**: Redesign and deployment of security architecture centered on SOC (bastions, proxies, trust boundaries, network segmentation, hybrid cloud, latest protocols).
+- **Cisco Systems**: Created rules, playbooks, alerts; wrote scripts, API calls, and automation for efficiency.
+- **Equifax**: Cloud planning, implementation, and hand-off of critical security solutions.
+
+### Contact
+- **Headquarters**: 4030 Wake Forest Road, STE 349, Raleigh, NC 27609, USA
+- **Phone**: +1 919 907 9059
+- **Email**: info@romanconsulting.io
+
+**Call to Action:** Let's work together! Contact for a free evaluation of your security posture.
+
+*Note: The site includes a contact form (JavaScript required) and links to additional detailed service pages.*

@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# Elbrus Cloud - one-shot VM bootstrap.
+#
+# Assumes a fresh Ubuntu 22.04+ LTS VM on Azure. Run as a sudo-capable user.
+# Steps:
+#   1. Install system packages (Python, Node, Nginx, certbot).
+#   2. Create the `elbrus` system user.
+#   3. Clone the repo (or expect it already cloned at /opt/elbrus/app).
+#   4. Create the venv, install Python deps.
+#   5. Build the React island + Tailwind CSS.
+#   6. Run migrate + collectstatic.
+#   7. Install systemd units + Nginx config.
+#   8. Reload services.
+#
+# It is idempotent enough to re-run after a `git pull` to redeploy.
+# ---------------------------------------------------------------------------
+set -euo pipefail
+
+REPO_URL="${REPO_URL:-https://github.com/your-org/elbrusconsult.git}"
+APP_ROOT="/opt/elbrus"
+APP_DIR="${APP_ROOT}/app"
+VENV_DIR="${APP_ROOT}/venv"
+BRANCH="${BRANCH:-main}"
+
+log() { printf "\033[1;34m==>\033[0m %s\n" "$*"; }
+
+# -------------------------------------------------------------------------
+log "Installing system packages..."
+sudo apt-get update -y
+sudo apt-get install -y \
+    python3 python3-venv python3-dev build-essential \
+    nginx certbot python3-certbot-nginx \
+    git curl ca-certificates \
+    libpq-dev pkg-config
+
+# Node.js 20 LTS via NodeSource.
+if ! command -v node >/dev/null 2>&1; then
+    log "Installing Node.js 20..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+fi
+
+# -------------------------------------------------------------------------
+log "Ensuring 'elbrus' system user..."
+if ! id elbrus >/dev/null 2>&1; then
+    sudo useradd --system --create-home --home-dir "${APP_ROOT}" \
+                 --shell /usr/sbin/nologin elbrus
+fi
+sudo mkdir -p "${APP_ROOT}"
+sudo chown -R elbrus:elbrus "${APP_ROOT}"
+
+# -------------------------------------------------------------------------
+log "Fetching application code..."
+if [ ! -d "${APP_DIR}/.git" ]; then
+    sudo -u elbrus git clone --branch "${BRANCH}" "${REPO_URL}" "${APP_DIR}"
+else
+    sudo -u elbrus git -C "${APP_DIR}" fetch --all --prune
+    sudo -u elbrus git -C "${APP_DIR}" checkout "${BRANCH}"
+    sudo -u elbrus git -C "${APP_DIR}" pull --ff-only
+fi
+
+# -------------------------------------------------------------------------
+log "Setting up Python virtualenv..."
+if [ ! -d "${VENV_DIR}" ]; then
+    sudo -u elbrus python3 -m venv "${VENV_DIR}"
+fi
+sudo -u elbrus "${VENV_DIR}/bin/pip" install --upgrade pip wheel
+sudo -u elbrus "${VENV_DIR}/bin/pip" install -r "${APP_DIR}/backend/requirements/prod.txt"
+
+# -------------------------------------------------------------------------
+log "Building frontend assets..."
+# Tailwind CSS
+sudo -u elbrus bash -lc "cd '${APP_DIR}/backend' && npm install --no-audit --no-fund && npm run build:css"
+# React scheduling island
+sudo -u elbrus bash -lc "cd '${APP_DIR}/frontend/scheduling-island' && npm install --no-audit --no-fund && npm run build"
+
+# -------------------------------------------------------------------------
+log "Running Django management commands..."
+if [ ! -f "${APP_DIR}/.env" ]; then
+    log "WARNING: ${APP_DIR}/.env is missing. Copy .env.example and fill in real values."
+fi
+sudo -u elbrus bash -lc "cd '${APP_DIR}/backend' && \
+    DJANGO_SETTINGS_MODULE=elbrus.settings.prod '${VENV_DIR}/bin/python' manage.py migrate --noinput"
+sudo -u elbrus bash -lc "cd '${APP_DIR}/backend' && \
+    DJANGO_SETTINGS_MODULE=elbrus.settings.prod '${VENV_DIR}/bin/python' manage.py collectstatic --noinput"
+
+# -------------------------------------------------------------------------
+log "Installing systemd units..."
+sudo install -m 0644 "${APP_DIR}/infra/systemd/gunicorn.service" /etc/systemd/system/gunicorn.service
+sudo install -m 0644 "${APP_DIR}/infra/systemd/gunicorn.socket"  /etc/systemd/system/gunicorn.socket
+sudo systemctl daemon-reload
+sudo systemctl enable --now gunicorn.socket
+sudo systemctl restart gunicorn.service
+
+# -------------------------------------------------------------------------
+log "Installing nginx site..."
+sudo install -m 0644 "${APP_DIR}/infra/nginx/elbrus.conf" /etc/nginx/sites-available/elbrus.conf
+sudo ln -sf /etc/nginx/sites-available/elbrus.conf /etc/nginx/sites-enabled/elbrus.conf
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t
+sudo systemctl reload nginx
+
+log "Bootstrap complete."
+log "Next steps: point DNS at this VM, then run:"
+log "  sudo certbot --nginx -d elbruscloud.example -d www.elbruscloud.example"

@@ -1,0 +1,23 @@
+# Core framework
+Django>=5.1,<5.3
+
+# Configuration
+django-environ>=0.11,<1.0
+
+# Database
+psycopg[binary]>=3.2,<4.0
+
+# Static files (used in prod under nginx + gunicorn)
+whitenoise>=6.7,<7.0
+
+# WSGI server
+gunicorn>=23.0,<24.0
+
+# Content / SEO
+markdown>=3.6,<4.0
+bleach>=6.1,<7.0
+Pillow>=10.4,<12.0
+django-robots>=6.1,<7.0
+
+# Utilities
+python-slugify>=8.0,<9.0

@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+ * Base typography & layout polish.
+ * ------------------------------------------------------------------------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-feature-settings: "cv11", "ss01", "ss03";
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Form input styling reused across contact/newsletter forms.
+ * ------------------------------------------------------------------------- */
+@layer components {
+  .form-input {
+    @apply mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2
+           text-slate-900 placeholder-slate-400
+           focus:outline-none focus:ring-2 focus:ring-summit-500 focus:border-summit-500;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center rounded-md bg-summit-600 px-4 py-2 text-white
+           font-medium shadow-sm hover:bg-summit-700 focus:outline-none
+           focus:ring-2 focus:ring-summit-500 focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center rounded-md border border-slate-300 px-4 py-2
+           text-slate-700 font-medium hover:bg-slate-100 focus:outline-none
+           focus:ring-2 focus:ring-summit-500 focus:ring-offset-2;
+  }
+}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-20">
+    <p class="text-sm font-semibold uppercase tracking-wider text-summit-700">About</p>
+    <h1 class="mt-2 text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">
+      Clear, concise solutions to hard security problems.
+    </h1>
+
+    <div class="prose prose-slate mt-8 max-w-none">
+      <p>
+        {{ SITE_NAME }} is a boutique firm of cloud and cybersecurity consultants. Our team
+        evaluates your risk of a breach and designs optimal controls tailored to your needs.
+      </p>
+
+      <h2>Two decades of focused expertise</h2>
+      <p>
+        Our consultants have spent careers - in many cases more than twenty years - working
+        exclusively in information security. Architects, engineers, analysts, and developers,
+        all with hands-on experience securing applications, networks, operations, and data.
+      </p>
+
+      <h2>How we work</h2>
+      <ul>
+        <li>Assess: We start with a clear-eyed look at your current state.</li>
+        <li>Design: We translate findings into prioritized, realistic remediation plans.</li>
+        <li>Implement: We work alongside your team - not in a vacuum.</li>
+        <li>Transfer: We leave you with documented operating procedures and trained staff.</li>
+      </ul>
+
+      <h2>Industries we serve</h2>
+      <p>
+        Financial services, healthcare, pharmaceuticals, manufacturing, utilities, and
+        communications. Our expertise spans ransomware, phishing, DDoS, cloud
+        misconfigurations, malware, identity and access management, and more.
+      </p>
+
+      <blockquote>
+        Cybersecurity protects digital systems from attacks while keeping business processes
+        running. Done right, it is not a tax on the business - it is an enabler.
+      </blockquote>
+    </div>
+
+    <div class="mt-12 flex flex-wrap gap-4">
+      <a href="{% url 'services-list' %}"
+         class="inline-flex items-center rounded-md bg-summit-600 px-4 py-2 text-white font-medium hover:bg-summit-700">
+        See our services
+      </a>
+      <a href="{% url 'contact' %}"
+         class="inline-flex items-center rounded-md border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-100">
+        Get in touch
+      </a>
+    </div>
+  </section>
+{% endblock %}

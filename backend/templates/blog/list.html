@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
+    <header class="max-w-2xl">
+      <p class="text-sm font-semibold uppercase tracking-wider text-summit-700">Blog</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">
+        {% if current_category %}{{ current_category.name }}
+        {% elif current_tag %}#{{ current_tag.name }}
+        {% else %}Insights from the team
+        {% endif %}
+      </h1>
+      <p class="mt-4 text-slate-600">
+        {% if current_category %}{{ current_category.description }}
+        {% else %}Practical posts on cloud architecture, identity, controls, and threat response.
+        {% endif %}
+      </p>
+    </header>
+
+    <form method="get" class="mt-8 flex max-w-md gap-2" role="search" aria-label="Search posts">
+      <label class="sr-only" for="q">Search</label>
+      <input id="q" name="q" type="search" value="{{ query }}" placeholder="Search posts..."
+             class="flex-1 rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-summit-500">
+      <button type="submit"
+              class="rounded-md bg-summit-600 px-4 py-2 text-white font-medium hover:bg-summit-700">
+        Search
+      </button>
+    </form>
+
+    {% if categories %}
+      <nav aria-label="Categories" class="mt-6 flex flex-wrap gap-2 text-sm">
+        <a class="rounded-full border border-slate-300 px-3 py-1 hover:bg-slate-100" href="{% url 'blog-list' %}">All</a>
+        {% for category in categories %}
+          <a class="rounded-full border border-slate-300 px-3 py-1 hover:bg-slate-100
+                    {% if current_category and current_category.slug == category.slug %}bg-summit-600 text-white border-summit-600{% endif %}"
+             href="{{ category.get_absolute_url }}">{{ category.name }}</a>
+        {% endfor %}
+      </nav>
+    {% endif %}
+
+    <ul class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+      {% for post in posts %}
+        <li class="group rounded-lg border border-slate-200 bg-white p-6 hover:border-summit-400 hover:shadow-md transition">
+          {% if post.hero_image %}
+            <img src="{{ post.hero_image.url }}" alt="{{ post.hero_image_alt }}"
+                 class="mb-4 aspect-[16/9] w-full object-cover rounded" loading="lazy">
+          {% endif %}
+          <p class="text-xs text-slate-500">
+            {% if post.published_at %}<time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"F j, Y" }}</time>{% endif %}
+            {% if post.category %} &middot; <a class="hover:text-summit-700" href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a>{% endif %}
+          </p>
+          <h2 class="mt-1 text-xl font-semibold text-slate-900">
+            <a class="group-hover:text-summit-700" href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+          </h2>
+          <p class="mt-2 text-slate-600">{{ post.excerpt }}</p>
+        </li>
+      {% empty %}
+        <li class="text-slate-600">
+          {% if query %}No posts match &ldquo;{{ query }}&rdquo;.{% else %}New posts are on the way.{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if is_paginated %}
+      <nav class="mt-10 flex justify-center gap-4 text-sm" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+          <a class="rounded-md border border-slate-300 px-3 py-2 hover:bg-slate-100"
+             href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">&larr; Previous</a>
+        {% endif %}
+        <span class="px-3 py-2 text-slate-500">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="rounded-md border border-slate-300 px-3 py-2 hover:bg-slate-100"
+             href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Next &rarr;</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,17 @@
+<!-- Source SVG for the default OG image.
+
+A real PNG should replace static/img/og-default.png (1200x630) for production.
+Open Graph crawlers prefer raster formats. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <path d="M0 520 L200 320 L380 420 L560 240 L760 380 L940 280 L1200 420 L1200 630 L0 630 Z" fill="#0f4d8c" opacity="0.7"/>
+  <path d="M0 580 L240 400 L420 480 L620 320 L820 440 L1000 360 L1200 480 L1200 630 L0 630 Z" fill="#1e40af" opacity="0.5"/>
+  <text x="60" y="220" font-family="Inter, system-ui, sans-serif" font-size="72" font-weight="800" fill="#ffffff">Elbrus Cloud</text>
+  <text x="60" y="290" font-family="Inter, system-ui, sans-serif" font-size="36" font-weight="500" fill="#cbd5e1">Cloud Engineering &amp; Cybersecurity Excellence</text>
+</svg>

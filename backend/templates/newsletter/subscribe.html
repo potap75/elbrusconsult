@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-20">
+    <p class="text-sm font-semibold uppercase tracking-wider text-summit-700">Newsletter</p>
+    <h1 class="mt-2 text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">
+      Monthly insights, no fluff.
+    </h1>
+    <p class="mt-4 text-slate-600">
+      One short, focused email per month: practical guidance on cloud security,
+      lessons from real engagements, and the occasional war story.
+    </p>
+
+    <form method="post" action="" class="mt-8 flex flex-col sm:flex-row gap-3 bg-white border border-slate-200 rounded-lg p-6 shadow-sm" novalidate>
+      {% csrf_token %}
+
+      <label class="sr-only" for="{{ form.email.id_for_label }}">Email address</label>
+      {{ form.email }}
+
+      <div class="hidden" aria-hidden="true">{{ form.website }}</div>
+
+      <button type="submit"
+              class="inline-flex items-center justify-center rounded-md bg-summit-600 px-5 py-3 text-white font-semibold hover:bg-summit-700">
+        Subscribe
+      </button>
+    </form>
+
+    {% if form.email.errors %}<p class="mt-2 text-sm text-rose-600">{{ form.email.errors|join:", " }}</p>{% endif %}
+
+    <p class="mt-4 text-xs text-slate-500">We use double opt-in. No spam, ever. Unsubscribe in one click.</p>
+  </section>
+{% endblock %}

@@ -1,0 +1,44 @@
+[project]
+name = "elbrus"
+version = "0.1.0"
+description = "Elbrus Cloud marketing site - Django backend"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [
+    "venv",
+    ".venv",
+    "**/migrations/*",
+    "staticfiles",
+    "static/dist",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "DJ"]
+ignore = [
+    "E501",  # line length handled by formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/settings/*.py" = ["F401", "F403", "F405"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+extend-exclude = '''
+/(
+    venv
+  | \.venv
+  | migrations
+  | staticfiles
+  | static/dist
+)/
+'''
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "elbrus.settings.dev"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "-ra -q"
+pythonpath = ["apps", "."]

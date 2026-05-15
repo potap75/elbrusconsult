@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-24 text-center">
+    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">Thanks - we got your message.</h1>
+    <p class="mt-4 text-slate-600">A consultant will reach out shortly. In the meantime, feel free to browse our work.</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a href="{% url 'services-list' %}"
+         class="inline-flex items-center rounded-md bg-summit-600 px-4 py-2 text-white font-medium hover:bg-summit-700">
+        Explore services
+      </a>
+      <a href="{% url 'blog-list' %}"
+         class="inline-flex items-center rounded-md border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-100">
+        Read the blog
+      </a>
+    </div>
+  </section>
+{% endblock %}

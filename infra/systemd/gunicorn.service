@@ -1,0 +1,29 @@
+[Unit]
+Description=Elbrus Cloud Gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+Type=notify
+User=elbrus
+Group=elbrus
+RuntimeDirectory=elbrus
+WorkingDirectory=/opt/elbrus/app/backend
+EnvironmentFile=/opt/elbrus/app/.env
+Environment=DJANGO_SETTINGS_MODULE=elbrus.settings.prod
+ExecStart=/opt/elbrus/venv/bin/gunicorn \
+          --workers 3 \
+          --bind unix:/run/elbrus/gunicorn.sock \
+          --access-logfile - \
+          --error-logfile - \
+          --timeout 60 \
+          elbrus.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
