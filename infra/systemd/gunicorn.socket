@@ -3,8 +3,8 @@ Description=Elbrus Cloud Gunicorn socket
 
 [Socket]
 ListenStream=/run/elbrus/gunicorn.sock
-SocketUser=www-data
-SocketGroup=www-data
+SocketUser=elbrus
+SocketGroup=elbrus
 SocketMode=0660
 
 [Install]
