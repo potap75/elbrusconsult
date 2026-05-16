@@ -91,3 +91,6 @@ secrets/
 # Cursor
 # =========================
 .cursor/plans/
+
+
+postgres_pw.txt
