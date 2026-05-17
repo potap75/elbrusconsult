@@ -14,6 +14,57 @@ from pages.models import Service
 
 SERVICES = [
     {
+        "name": "Cloud Transformation",
+        "tagline": "One managed network. One team. Always watching.",
+        "summary": (
+            "We move small and mid-sized businesses off scattered laptops and shadow "
+            "IT and onto a single, centrally-managed cloud network - with 24/7 "
+            "security monitoring built in. Enterprise-grade visibility, without an "
+            "enterprise-sized IT department."
+        ),
+        "icon": "cloud",
+        "order": 5,
+        "is_featured": True,
+        "body_markdown": (
+            "## Why centralize?\n\n"
+            "When every laptop, server, and SaaS account lives on its own little "
+            "island, your security only works on the days everyone remembers the "
+            "rules. We replace that fragile setup with a single, managed cloud "
+            "network - the foundation everything else rides on.\n\n"
+            "## What you get\n\n"
+            "- **One network, end to end.** Every employee device, server, and "
+            "cloud workload joins the same managed, segmented network. No more "
+            "open coffee-shop Wi-Fi connecting straight to your file server.\n"
+            "- **24/7 security monitoring.** Real engineers watch real alerts - "
+            "not just a dashboard you have to remember to check. Threats get "
+            "triaged, contained, and reported the same day.\n"
+            "- **Centralized policies.** Patches, antivirus, encryption, MFA, "
+            "password rules - set once, enforced everywhere. New hire on Monday? "
+            "They are fully provisioned and protected before lunch.\n"
+            "- **A clear bill of health.** Monthly reports tell you exactly "
+            "what's online, what's patched, what changed, and what we caught.\n"
+            "- **One number to call.** Stolen laptop, phishing scare, ransomware "
+            "attempt - you reach a team that already knows your environment.\n\n"
+            "## Built for small and mid-sized businesses\n\n"
+            "You should not need a Fortune-500 IT department to get Fortune-500 "
+            "security. We bring the same controls and monitoring big enterprises "
+            "rely on, sized and priced for a 10-250 person company.\n\n"
+            "## How it works\n\n"
+            "1. **Assess.** A short engagement to map every device, account, and "
+            "data flow you have today.\n"
+            "2. **Transition.** We migrate your devices and identities into a "
+            "managed cloud network on your schedule, without breaking anyone's "
+            "day.\n"
+            "3. **Operate.** Monitoring, patching, response, and reporting - "
+            "handled. You focus on the business.\n\n"
+            "## What changes for your team\n\n"
+            "Almost nothing - and that's the point. Logins feel the same. Files "
+            "are where they were. The difference is what happens behind the "
+            "scenes: every device is hardened, every action is logged, and "
+            "every alarm is answered."
+        ),
+    },
+    {
         "name": "Risk",
         "tagline": "Identify gaps. Close them, fast.",
         "summary": (

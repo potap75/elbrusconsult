@@ -8,6 +8,7 @@ Type=notify
 User=elbrus
 Group=elbrus
 RuntimeDirectory=elbrus
+RuntimeDirectoryPreserve=yes
 WorkingDirectory=/opt/elbrus/app/backend
 EnvironmentFile=/opt/elbrus/app/.env
 Environment=DJANGO_SETTINGS_MODULE=elbrus.settings.prod
