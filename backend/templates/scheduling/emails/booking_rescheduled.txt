@@ -1,0 +1,19 @@
+Hi {{ booking.name }},
+
+Your {{ booking.appointment_type.name }} with {{ site_name }} has been
+rescheduled.
+
+Was:   {{ old_booking.start_at|date:"l, F j, Y" }} at {{ old_booking.start_at|date:"H:i" }} UTC
+Now:   {{ booking.start_at|date:"l, F j, Y" }} at {{ booking.start_at|date:"H:i" }} UTC
+       ({{ booking.appointment_type.duration_minutes }} minutes)
+{% if booking.customer_timezone %}Your TZ: {{ booking.customer_timezone }}{% endif %}
+{% if booking.appointment_type.location_instructions %}Where: {{ booking.appointment_type.location_instructions }}{% endif %}
+
+We have attached an updated calendar invite.
+
+Need to change or cancel again? Use this private link:
+{{ manage_url }}
+
+Thanks,
+{{ site_name }}
+{{ site_url }}

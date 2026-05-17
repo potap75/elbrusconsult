@@ -63,6 +63,20 @@ INFO_EMAIL = env("INFO_EMAIL", default="info@elbruscloud.example")
 CONTACT_RECIPIENT_EMAIL = env("CONTACT_RECIPIENT_EMAIL", default=INFO_EMAIL)
 
 # ----------------------------------------------------------------------------
+# Scheduling (booking calendar)
+# ----------------------------------------------------------------------------
+# Company timezone the weekly AvailabilityRule windows are interpreted in.
+SCHEDULING_TIMEZONE = env.str("SCHEDULING_TIMEZONE", default="America/New_York")
+# Customers cannot book a slot starting sooner than this many minutes from now.
+SCHEDULING_MIN_LEAD_MINUTES = env.int("SCHEDULING_MIN_LEAD_MINUTES", default=120)
+# Customers cannot book further out than this many days from today.
+SCHEDULING_MAX_LEAD_DAYS = env.int("SCHEDULING_MAX_LEAD_DAYS", default=60)
+# Slot start times are aligned to this granularity inside an availability window.
+SCHEDULING_SLOT_GRANULARITY_MINUTES = env.int(
+    "SCHEDULING_SLOT_GRANULARITY_MINUTES", default=15
+)
+
+# ----------------------------------------------------------------------------
 # Application definition
 # ----------------------------------------------------------------------------
 DJANGO_APPS = [

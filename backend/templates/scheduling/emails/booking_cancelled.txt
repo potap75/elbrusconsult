@@ -1,0 +1,12 @@
+Hi {{ booking.name }},
+
+Your {{ booking.appointment_type.name }} with {{ site_name }} on
+{{ booking.start_at|date:"l, F j, Y" }} at {{ booking.start_at|date:"H:i" }} UTC
+has been cancelled.
+
+If this wasn't expected, just reply to this email and we'll sort it out.
+
+To book a new time, visit {{ site_url }}/schedule/.
+
+Thanks,
+{{ site_name }}

@@ -8,21 +8,27 @@
       Book a consultation
     </h1>
     <p class="mt-4 text-slate-600 max-w-2xl">
-      Tell us about your project and pick a preferred time. A senior consultant
-      will follow up to confirm the meeting. Full self-service booking is coming
-      soon - for now we handle scheduling personally.
+      Pick an appointment type, choose a time that works for you, and we'll
+      confirm immediately with a calendar invite.
     </p>
 
     {# Anchor for the React island #}
     <div id="schedule-root"
          class="mt-10"
+         data-appointment-types-url="{{ appointment_types_endpoint }}"
+         data-slots-url="{{ slots_endpoint }}"
+         data-bookings-url="{{ bookings_endpoint }}"
+         data-booking-lookup-url="{{ booking_lookup_endpoint }}"
          data-services-url="{{ services_endpoint }}"
-         data-inquiry-url="{{ inquiry_endpoint }}"
+         data-default-timezone="{{ default_timezone }}"
+         data-schedule-url="{% url 'schedule' %}"
          data-csrf-token="{{ csrf_token }}">
       {# Server-rendered fallback (also runs for users with JS disabled) #}
       <noscript>
         <div class="rounded-md border border-amber-300 bg-amber-50 p-4 text-amber-900">
-          This form requires JavaScript. Please <a class="underline" href="{% url 'contact' %}">use the contact form</a> instead.
+          The booking calendar requires JavaScript. Please
+          <a class="underline" href="{% url 'contact' %}">use the contact form</a>
+          and we'll schedule with you by email.
         </div>
       </noscript>
       <div class="rounded-lg border border-slate-200 bg-white p-8 shadow-sm animate-pulse">

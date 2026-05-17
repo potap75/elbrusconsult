@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; max-width: 640px; margin: 0 auto; padding: 24px;">
+    <h1 style="font-size: 18px; margin: 0 0 12px;">New booking on {{ site_name }}</h1>
+    <table style="border-collapse: collapse; font-size: 14px;">
+      <tr><td style="padding: 4px 12px 4px 0; color: #475569;">When</td><td>{{ booking.start_at|date:"l, F j, Y" }} at {{ booking.start_at|date:"H:i" }} UTC</td></tr>
+      <tr><td style="padding: 4px 12px 4px 0; color: #475569;">Type</td><td>{{ booking.appointment_type.name }} ({{ booking.appointment_type.duration_minutes }} min)</td></tr>
+      <tr><td style="padding: 4px 12px 4px 0; color: #475569;">Customer</td><td>{{ booking.name }} &lt;{{ booking.email }}&gt;</td></tr>
+      <tr><td style="padding: 4px 12px 4px 0; color: #475569;">Company</td><td>{{ booking.company|default:"-" }}</td></tr>
+      <tr><td style="padding: 4px 12px 4px 0; color: #475569;">Phone</td><td>{{ booking.phone|default:"-" }}</td></tr>
+      <tr><td style="padding: 4px 12px 4px 0; color: #475569;">Service</td><td>{% if booking.service %}{{ booking.service.name }}{% else %}-{% endif %}</td></tr>
+      <tr><td style="padding: 4px 12px 4px 0; color: #475569;">Customer TZ</td><td>{{ booking.customer_timezone|default:"-" }}</td></tr>
+      {% if booking.rescheduled_from %}
+      <tr><td style="padding: 4px 12px 4px 0; color: #475569;">Rescheduled from</td><td>{{ booking.rescheduled_from.start_at|date:"Y-m-d H:i" }} UTC</td></tr>
+      {% endif %}
+    </table>
+    <h2 style="font-size: 14px; margin: 16px 0 4px;">Notes</h2>
+    <pre style="white-space: pre-wrap; background: #f1f5f9; padding: 12px; border-radius: 6px; font-family: inherit;">{{ booking.notes|default:"(none)" }}</pre>
+    <p><a href="{{ manage_url }}">Open manage page</a></p>
+  </body>
+</html>

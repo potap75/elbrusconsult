@@ -1,0 +1,15 @@
+New booking on {{ site_name }}.
+
+When:        {{ booking.start_at|date:"l, F j, Y" }} at {{ booking.start_at|date:"H:i" }} UTC
+Type:        {{ booking.appointment_type.name }} ({{ booking.appointment_type.duration_minutes }} min)
+Customer:    {{ booking.name }} <{{ booking.email }}>
+Company:     {{ booking.company|default:"-" }}
+Phone:       {{ booking.phone|default:"-" }}
+Service:     {% if booking.service %}{{ booking.service.name }}{% else %}-{% endif %}
+Customer TZ: {{ booking.customer_timezone|default:"-" }}
+{% if booking.rescheduled_from %}Rescheduled from: {{ booking.rescheduled_from.start_at|date:"Y-m-d H:i" }} UTC{% endif %}
+
+Notes:
+{{ booking.notes|default:"(none)" }}
+
+Manage: {{ manage_url }}

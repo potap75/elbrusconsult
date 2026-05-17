@@ -158,16 +158,118 @@ Certbot will edit the Nginx config in place and set up automatic renewal.
 
 ---
 
-## 5. Redeploying
+## 5. Pulling changes on the VM
 
-To deploy new code, re-run the bootstrap script. It is idempotent:
+### Quick path — re-run the bootstrap script
+
+The bootstrap script is fully idempotent. Re-running it is the safest and
+recommended way to deploy any set of changes:
 
 ```bash
 sudo /usr/local/sbin/elbrus-bootstrap
 ```
 
-This pulls the latest commit, reinstalls deps if changed, rebuilds CSS + JS,
-re-runs `migrate` + `collectstatic`, and restarts Gunicorn.
+What it does in order:
+
+1. `git fetch` + `git pull --ff-only` on the `main` branch.
+2. `pip install -r backend/requirements/prod.txt` (only installs new/changed packages).
+3. `npm install` + `npm run build:css` (Tailwind) and `npm run build` (React island).
+4. `python manage.py migrate --noinput`
+5. `python manage.py collectstatic --noinput`
+6. Restarts `gunicorn.service`.
+
+The whole run usually takes 60–120 seconds. Watch it live:
+
+```bash
+sudo /usr/local/sbin/elbrus-bootstrap 2>&1 | tee /tmp/deploy.log
+```
+
+---
+
+### Manual step-by-step path
+
+Use this if you want finer control or need to roll back a single step.
+
+**1. SSH into the VM**
+
+```bash
+ssh elbrusops@<public-ip>
+```
+
+**2. Pull the latest code**
+
+```bash
+sudo -u elbrus git -C /opt/elbrus/app fetch --all --prune
+sudo -u elbrus git -C /opt/elbrus/app pull --ff-only
+```
+
+**3. Install any new Python dependencies**
+
+```bash
+sudo -u elbrus /opt/elbrus/venv/bin/pip install -r /opt/elbrus/app/backend/requirements/prod.txt
+```
+
+**4. Rebuild frontend assets** (skip if only Python/template changes)
+
+```bash
+# Tailwind CSS
+sudo -u elbrus bash -lc "cd /opt/elbrus/app/backend && npm install --no-audit --no-fund && npm run build:css"
+
+# React scheduling island
+sudo -u elbrus bash -lc "cd /opt/elbrus/app/frontend/scheduling-island && npm install --no-audit --no-fund && npm run build"
+```
+
+**5. Run database migrations**
+
+```bash
+sudo -u elbrus bash -lc "
+  cd /opt/elbrus/app/backend
+  DJANGO_SETTINGS_MODULE=elbrus.settings.prod \
+    /opt/elbrus/venv/bin/python manage.py migrate --noinput
+"
+```
+
+**6. Collect static files**
+
+```bash
+sudo -u elbrus bash -lc "
+  cd /opt/elbrus/app/backend
+  DJANGO_SETTINGS_MODULE=elbrus.settings.prod \
+    /opt/elbrus/venv/bin/python manage.py collectstatic --noinput
+"
+```
+
+**7. Restart Gunicorn**
+
+```bash
+sudo systemctl restart gunicorn.service
+```
+
+Verify the service came back up:
+
+```bash
+sudo systemctl status gunicorn.service
+```
+
+**8. (Optional) Reload Nginx**
+
+Only needed if the Nginx config changed:
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+---
+
+### Verifying the deployment
+
+```bash
+# Tail Gunicorn logs for errors
+journalctl -u gunicorn -f
+
+# Quick HTTP health check
+curl -sf https://elbruscloud.example/healthz && echo "OK"
+```
 
 ---
 

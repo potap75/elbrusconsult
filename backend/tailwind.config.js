@@ -4,7 +4,9 @@ module.exports = {
     "./templates/**/*.html",
     "./apps/**/templates/**/*.html",
     "./static/src/**/*.{js,ts}",
-    "../frontend/**/src/**/*.{ts,tsx,js,jsx}",
+    // Scan the React island sources, but skip nested node_modules to avoid
+    // accidentally walking a multi-megabyte tree.
+    "../frontend/*/src/**/*.{ts,tsx,js,jsx}",
   ],
   theme: {
     extend: {

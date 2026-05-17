@@ -1,0 +1,8 @@
+Booking cancelled on {{ site_name }}.
+
+When:     {{ booking.start_at|date:"l, F j, Y" }} at {{ booking.start_at|date:"H:i" }} UTC
+Type:     {{ booking.appointment_type.name }} ({{ booking.appointment_type.duration_minutes }} min)
+Customer: {{ booking.name }} <{{ booking.email }}>
+Reason:   {{ booking.cancel_reason|default:"(not provided)" }}
+
+Admin link: {{ manage_url }}

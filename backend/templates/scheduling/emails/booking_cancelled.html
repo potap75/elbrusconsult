@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; max-width: 560px; margin: 0 auto; padding: 24px;">
+    <h1 style="font-size: 20px; margin: 0 0 16px;">Your booking is cancelled</h1>
+    <p>Hi {{ booking.name }},</p>
+    <p>
+      Your <strong>{{ booking.appointment_type.name }}</strong> with
+      {{ site_name }} on
+      {{ booking.start_at|date:"l, F j, Y" }} at {{ booking.start_at|date:"H:i" }} UTC
+      has been cancelled.
+    </p>
+    <p>
+      If this wasn't expected, just reply to this email and we'll sort it out.
+    </p>
+    <p>
+      To book a new time, <a href="{{ site_url }}/schedule/">visit the booking page</a>.
+    </p>
+    <p style="color: #64748b; font-size: 13px; margin-top: 32px;">
+      {{ site_name }} &middot; <a href="{{ site_url }}">{{ site_url }}</a>
+    </p>
+  </body>
+</html>

@@ -246,3 +246,14 @@ def test_scheduling_services_api_lists_published(seeded_db):
     assert "services" in data
     names = [s["name"] for s in data["services"]]
     assert "Risk" in names
+
+
+@pytest.mark.django_db
+def test_scheduling_appointment_types_api_lists_seeded(seeded_db):
+    client = Client()
+    response = client.get(reverse("scheduling-api-appointment-types"))
+    assert response.status_code == 200
+    data = response.json()
+    slugs = [t["slug"] for t in data["appointment_types"]]
+    assert "discovery-call" in slugs
+    assert "deep-dive-consultation" in slugs

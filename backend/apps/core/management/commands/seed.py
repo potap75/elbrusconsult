@@ -8,9 +8,12 @@ from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from datetime import time
+
 from blog.models import Category, Post
 from newsletter.models import Subscriber  # noqa: F401 (imported for migration safety)
 from pages.models import Service
+from scheduling.models import AppointmentType, AvailabilityRule
 
 SERVICES = [
     {
@@ -205,6 +208,39 @@ SERVICES = [
 ]
 
 
+APPOINTMENT_TYPES = [
+    {
+        "slug": "discovery-call",
+        "name": "Discovery call",
+        "duration_minutes": 30,
+        "buffer_after_minutes": 10,
+        "description": (
+            "A free 30-minute intro call to scope your needs and decide if "
+            "we're a good fit. No prep required."
+        ),
+        "location_instructions": "We'll send a Google Meet link to your email.",
+        "order": 10,
+    },
+    {
+        "slug": "deep-dive-consultation",
+        "name": "Deep dive consultation",
+        "duration_minutes": 60,
+        "buffer_after_minutes": 15,
+        "description": (
+            "A 60-minute working session for an existing scope: architecture "
+            "review, incident retrospective, or roadmap planning."
+        ),
+        "location_instructions": "We'll send a Google Meet link to your email.",
+        "order": 20,
+    },
+]
+
+
+WEEKDAY_AVAILABILITY = [0, 1, 2, 3, 4]  # Mon-Fri
+DEFAULT_WORK_START = time(9, 0)
+DEFAULT_WORK_END = time(17, 0)
+
+
 SAMPLE_POST = {
     "title": "Why your cloud baseline matters more than your next tool",
     "slug": "cloud-baseline-matters-more",
@@ -269,6 +305,47 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(
                 f"Services: {created_count} created, {updated_count} updated."
+            )
+        )
+
+        appt_created = appt_updated = 0
+        for payload in APPOINTMENT_TYPES:
+            _, created = AppointmentType.objects.update_or_create(
+                slug=payload["slug"],
+                defaults={
+                    "name": payload["name"],
+                    "duration_minutes": payload["duration_minutes"],
+                    "buffer_after_minutes": payload["buffer_after_minutes"],
+                    "description": payload["description"],
+                    "location_instructions": payload["location_instructions"],
+                    "order": payload["order"],
+                    "is_active": True,
+                },
+            )
+            if created:
+                appt_created += 1
+            else:
+                appt_updated += 1
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Appointment types: {appt_created} created, {appt_updated} updated."
+            )
+        )
+
+        rule_created = 0
+        for weekday in WEEKDAY_AVAILABILITY:
+            _, created = AvailabilityRule.objects.get_or_create(
+                weekday=weekday,
+                start_time=DEFAULT_WORK_START,
+                end_time=DEFAULT_WORK_END,
+                defaults={"is_active": True},
+            )
+            if created:
+                rule_created += 1
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Availability rules: {rule_created} created, "
+                f"{len(WEEKDAY_AVAILABILITY) - rule_created} already present."
             )
         )
 

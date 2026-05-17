@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; max-width: 560px; margin: 0 auto; padding: 24px;">
+    <h1 style="font-size: 20px; margin: 0 0 16px;">Your booking has moved</h1>
+    <p>Hi {{ booking.name }},</p>
+    <p>
+      Your <strong>{{ booking.appointment_type.name }}</strong> with
+      {{ site_name }} has been rescheduled.
+    </p>
+    <table style="border-collapse: collapse; margin: 16px 0;">
+      <tr>
+        <td style="padding: 4px 12px 4px 0; color: #475569;">Was</td>
+        <td style="padding: 4px 0; text-decoration: line-through; color: #94a3b8;">
+          {{ old_booking.start_at|date:"l, F j, Y" }} at {{ old_booking.start_at|date:"H:i" }} UTC
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 12px 4px 0; color: #475569;">Now</td>
+        <td style="padding: 4px 0;">
+          {{ booking.start_at|date:"l, F j, Y" }} at {{ booking.start_at|date:"H:i" }} UTC
+          <span style="color: #64748b;">({{ booking.appointment_type.duration_minutes }} min)</span>
+        </td>
+      </tr>
+    </table>
+    <p>We have attached an updated calendar invite.</p>
+    <p>
+      Need to change or cancel again?
+      <a href="{{ manage_url }}">Manage your booking</a>.
+    </p>
+    <p style="color: #64748b; font-size: 13px; margin-top: 32px;">
+      {{ site_name }} &middot; <a href="{{ site_url }}">{{ site_url }}</a>
+    </p>
+  </body>
+</html>

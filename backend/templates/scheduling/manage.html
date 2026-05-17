@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-20">
+    <p class="text-sm font-semibold uppercase tracking-wider text-summit-700">Your booking</p>
+    <h1 class="mt-2 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
+      {% if booking.status == 'cancelled' %}
+        Booking cancelled
+      {% else %}
+        Manage your booking
+      {% endif %}
+    </h1>
+
+    <div class="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <dl class="grid grid-cols-1 sm:grid-cols-3 gap-y-3 gap-x-6 text-sm">
+        <dt class="text-slate-500">Status</dt>
+        <dd class="sm:col-span-2 font-medium {% if booking.status == 'cancelled' %}text-rose-700{% else %}text-emerald-700{% endif %}">
+          {{ booking.get_status_display }}
+        </dd>
+
+        <dt class="text-slate-500">Type</dt>
+        <dd class="sm:col-span-2">
+          {{ booking.appointment_type.name }}
+          <span class="text-slate-500">({{ booking.appointment_type.duration_minutes }} min)</span>
+        </dd>
+
+        <dt class="text-slate-500">When</dt>
+        <dd class="sm:col-span-2">
+          <time datetime="{{ booking.start_at|date:'c' }}">
+            {{ booking.start_at|date:"l, F j, Y" }} at {{ booking.start_at|date:"H:i" }} UTC
+          </time>
+          {% if booking.customer_timezone %}
+            <span class="text-slate-500">&middot; you booked in {{ booking.customer_timezone }}</span>
+          {% endif %}
+        </dd>
+
+        {% if booking.appointment_type.location_instructions %}
+          <dt class="text-slate-500">Where</dt>
+          <dd class="sm:col-span-2">{{ booking.appointment_type.location_instructions }}</dd>
+        {% endif %}
+
+        <dt class="text-slate-500">Name</dt>
+        <dd class="sm:col-span-2">{{ booking.name }}</dd>
+
+        <dt class="text-slate-500">Email</dt>
+        <dd class="sm:col-span-2">{{ booking.email }}</dd>
+
+        {% if booking.company %}
+          <dt class="text-slate-500">Company</dt>
+          <dd class="sm:col-span-2">{{ booking.company }}</dd>
+        {% endif %}
+
+        {% if booking.notes %}
+          <dt class="text-slate-500">Notes</dt>
+          <dd class="sm:col-span-2 whitespace-pre-line">{{ booking.notes }}</dd>
+        {% endif %}
+      </dl>
+    </div>
+
+    {% if can_modify %}
+      <div class="mt-8 flex flex-col sm:flex-row gap-3">
+        <a href="{{ booking.get_reschedule_url }}"
+           class="inline-flex items-center justify-center rounded-md bg-summit-600 px-5 py-3 text-white font-semibold hover:bg-summit-700">
+          Reschedule
+        </a>
+        <form method="post" action="{% url 'scheduling-manage-cancel' token=booking.manage_token %}"
+              onsubmit="return confirm('Cancel this booking? This cannot be undone.');"
+              class="flex flex-col sm:flex-row gap-3 sm:items-center">
+          {% csrf_token %}
+          <input type="text" name="reason" maxlength="200" placeholder="Reason (optional)"
+                 class="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-summit-500 focus:border-summit-500">
+          <button type="submit"
+                  class="inline-flex items-center justify-center rounded-md border border-rose-300 bg-rose-50 px-5 py-3 text-rose-800 font-semibold hover:bg-rose-100">
+            Cancel booking
+          </button>
+        </form>
+      </div>
+    {% elif booking.status == 'cancelled' %}
+      <div class="mt-8 rounded-md border border-slate-200 bg-slate-50 p-4 text-slate-700">
+        This booking has been cancelled. To book a new time,
+        <a href="{% url 'schedule' %}" class="text-summit-700 underline">visit the booking page</a>.
+      </div>
+    {% else %}
+      <div class="mt-8 rounded-md border border-slate-200 bg-slate-50 p-4 text-slate-700">
+        This booking is in the past and can no longer be changed.
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}
