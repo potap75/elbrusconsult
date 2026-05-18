@@ -308,6 +308,10 @@ start.
 
 ## Conventions for agents working in this repo
 
+- **Shell:** the local dev machine runs **Windows 11 + PowerShell**. Always
+use PowerShell syntax for local commands (`Set-Location`, `Copy-Item`,
+`\` path separators, `Activate.ps1`, etc.). Bash/sh is only appropriate
+in situations like an SSH session on the Linux VM.
 - Don't break the "apps imported by short name" convention - new code
 should use `from core.seo import ...`, not `from apps.core.seo import ...`.
 - Keep all secrets in `.env` / Azure Key Vault. Never commit

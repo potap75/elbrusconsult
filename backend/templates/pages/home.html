@@ -45,7 +45,7 @@
 
     <ul class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {% for service in all_services %}
-        <li class="group rounded-lg border border-slate-200 bg-white p-6 hover:border-summit-400 hover:shadow-md transition">
+        <li class="group relative rounded-lg border border-slate-200 bg-white p-6 hover:border-summit-400 hover:shadow-md transition">
           <p class="text-sm font-semibold uppercase tracking-wide text-summit-700">{{ service.icon|default:"" }}</p>
           <h3 class="mt-2 text-lg font-semibold text-slate-900">
             <a href="{{ service.get_absolute_url }}" class="after:absolute after:inset-0 group-hover:text-summit-700">
