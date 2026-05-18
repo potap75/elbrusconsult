@@ -273,7 +273,28 @@ curl -sf https://elbruscloud.example/healthz && echo "OK"
 
 ---
 
-## 6. Operational notes
+## 6. Known gotchas
+
+### Rate limiter 500 errors (calendar greyed out)
+
+`django-ratelimit` raises `ImproperlyConfigured` when `REMOTE_ADDR` is empty,
+which always happens when Gunicorn runs behind Nginx via a Unix socket. The fix
+— `RATELIMIT_IP_META_KEY = "HTTP_X_REAL_IP"` — is already set in
+`settings/prod.py` and tells ratelimit to use the `X-Real-IP` header that Nginx
+injects from `$remote_addr`. No `.env` change is needed, but if you ever see
+`500` responses on `/schedule/api/slots/` or other rate-limited endpoints, this
+is the first thing to check in the Gunicorn logs.
+
+### Gunicorn fails to start (status=226/NAMESPACE)
+
+Systemd namespace-based sandboxing directives (`PrivateTmp`, `ProtectSystem`,
+etc.) are not supported on Azure B-series VMs when the service runs as a
+non-root user. The `infra/systemd/gunicorn.service` shipped in this repo omits
+those directives intentionally.
+
+---
+
+## 7. Operational notes
 
 - **Logs:** `journalctl -u gunicorn -f` and `/var/log/nginx/*.log`.
 - **Health check:** `https://elbruscloud.example/healthz`.

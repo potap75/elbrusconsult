@@ -31,23 +31,13 @@ Restart=on-failure
 RestartSec=5
 
 # --- Sandbox / hardening ----------------------------------------------------
-# These directives are applied by systemd before the worker starts. Together
-# they make it dramatically harder for a compromised Gunicorn worker to
-# escalate, persist, or pivot to other parts of the host.
+# Namespace-based directives (PrivateTmp, PrivateDevices, ProtectSystem,
+# ProtectHome, Protect{Kernel,Control,Clock,Hostname}*, RestrictNamespaces)
+# are intentionally omitted: they require mount/UTS namespace kernel features
+# that Azure B-series VMs restrict for non-root services, causing
+# status=226/NAMESPACE at startup. The directives below provide meaningful
+# hardening without namespace support.
 NoNewPrivileges=true
-PrivateTmp=true
-PrivateDevices=true
-ProtectSystem=strict
-# Writable paths the app legitimately needs.
-ReadWritePaths=/opt/elbrus/app/backend/media /opt/elbrus/app/backend/staticfiles /run/elbrus
-ProtectHome=true
-ProtectKernelTunables=true
-ProtectKernelModules=true
-ProtectKernelLogs=true
-ProtectControlGroups=true
-ProtectHostname=true
-ProtectClock=true
-RestrictNamespaces=true
 RestrictRealtime=true
 RestrictSUIDSGID=true
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6

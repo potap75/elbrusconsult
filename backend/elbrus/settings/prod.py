@@ -33,6 +33,11 @@ CSRF_COOKIE_SAMESITE = "Strict"
 # but pinning protects us from a future default change).
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 
+# django-ratelimit: when Gunicorn runs behind Nginx via a Unix socket,
+# REMOTE_ADDR is empty. Tell ratelimit to key on X-Real-IP, which Nginx
+# sets to $remote_addr (the actual client IP, single trusted value).
+RATELIMIT_IP_META_KEY = "HTTP_X_REAL_IP"
+
 # ----------------------------------------------------------------------------
 # Sentry (optional)
 # ----------------------------------------------------------------------------
