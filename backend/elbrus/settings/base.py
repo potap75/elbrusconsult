@@ -93,6 +93,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "robots",
+    "axes",
 ]
 
 LOCAL_APPS = [
@@ -115,6 +116,7 @@ ROBOTS_SITEMAP_URLS = [f"{SITE_URL}/sitemap.xml"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "core.middleware.SecurityHeadersMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -122,7 +124,17 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # django-axes must be the LAST middleware in the stack so that it sees
+    # the request after authentication has populated request.user.
+    "axes.middleware.AxesMiddleware",
+    # Renders Ratelimited exceptions via RATELIMIT_VIEW.
+    "django_ratelimit.middleware.RatelimitMiddleware",
 ]
+
+# When a view raises django_ratelimit.exceptions.Ratelimited (block=True),
+# RatelimitMiddleware routes the request to this view instead of the
+# default 403 page.
+RATELIMIT_VIEW = "core.views.ratelimited"
 
 ROOT_URLCONF = "elbrus.urls"
 
@@ -162,10 +174,56 @@ DATABASES = {
 # ----------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 12},
+    },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+# ----------------------------------------------------------------------------
+# Security headers / cookies (env-agnostic safe defaults)
+# ----------------------------------------------------------------------------
+# Cookies: never expose to JS; default to Lax so normal top-level form posts
+# still work. prod.py tightens to "Strict".
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+
+# These are safe to set unconditionally (no HTTPS dependency).
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+X_FRAME_OPTIONS = "DENY"
+
+# Cap inbound request bodies and individual file uploads at 5 MB. The Nginx
+# `client_max_body_size` is 25 MB; this is the Django-side belt to that
+# suspenders so a single malicious request can't tie up a Gunicorn worker
+# reading hundreds of MB.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+
+# ----------------------------------------------------------------------------
+# Authentication / brute-force protection (django-axes)
+# ----------------------------------------------------------------------------
+# AxesStandaloneBackend must come BEFORE Django's ModelBackend so that
+# axes can short-circuit lockouts before normal auth runs.
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+# Lock an attacker out after 5 failed admin logins, per (IP + username),
+# for 1 hour. A successful login from that IP clears the counter.
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1
+AXES_LOCKOUT_PARAMETERS = [["ip_address", "username"]]
+AXES_RESET_ON_SUCCESS = True
+# Trust nginx's X-Forwarded-For (rightmost entry) so the lockout key is
+# the real client IP. See core.net.get_client_ip for the same logic.
+AXES_IPWARE_PROXY_COUNT = 1
+AXES_IPWARE_META_PRECEDENCE_ORDER = ["HTTP_X_FORWARDED_FOR", "REMOTE_ADDR"]
 
 # ----------------------------------------------------------------------------
 # Internationalization

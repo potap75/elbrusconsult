@@ -5,23 +5,22 @@ from typing import Any
 from django.conf import settings
 from django.contrib import messages
 from django.core.mail import EmailMessage
-from django.http import HttpRequest
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views.generic import FormView, TemplateView
+from django_ratelimit.decorators import ratelimit
 
+from core.net import get_client_ip
 from core.schema import breadcrumb_schema
 from core.seo import SeoMixin
 
 from .forms import ContactForm
 
 
-def _get_client_ip(request: HttpRequest) -> str | None:
-    xff = request.META.get("HTTP_X_FORWARDED_FOR")
-    if xff:
-        return xff.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
-
-
+@method_decorator(
+    ratelimit(key="ip", rate="5/h", method="POST", block=True),
+    name="post",
+)
 class ContactView(SeoMixin, FormView):
     template_name = "contact/contact.html"
     form_class = ContactForm
@@ -34,7 +33,7 @@ class ContactView(SeoMixin, FormView):
 
     def form_valid(self, form: ContactForm) -> Any:
         instance = form.save(commit=False)
-        instance.ip_address = _get_client_ip(self.request)
+        instance.ip_address = get_client_ip(self.request)
         instance.user_agent = self.request.META.get("HTTP_USER_AGENT", "")[:500]
         instance.save()
 

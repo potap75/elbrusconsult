@@ -12,30 +12,42 @@ how it runs, and how it ships. Keep it current when those things change.
 ## Architecture
 
 ### Stack
+
 - **Backend:** Django 5.1+ (server-rendered templates, classic MVC).
 - **Database:** PostgreSQL 16 in production (Azure Database for PostgreSQL -
-  Flexible Server, private VNet access). SQLite is the default in local dev
-  when `DATABASE_URL` is unset.
+Flexible Server, private VNet access). SQLite is the default in local dev
+when `DATABASE_URL` is unset.
 - **Static / templates:** Django templates + Tailwind CSS 3 (standalone CLI).
-  WhiteNoise serves hashed static files in production via Gunicorn; Nginx
-  also has a direct `/static/` and `/media/` alias for hot-path assets.
+WhiteNoise serves hashed static files in production via Gunicorn; Nginx
+also has a direct `/static/` and `/media/` alias for hot-path assets.
 - **Frontend island:** React 18 + Vite + TypeScript, mounted on
-  `/schedule/` only. The rest of the site is plain server-rendered HTML.
+`/schedule/` only. The rest of the site is plain server-rendered HTML.
 - **Email:** SMTP in prod, console backend in dev. Booking emails are
-  rendered from `backend/templates/scheduling/emails/*` (HTML + text twins).
+rendered from `backend/templates/scheduling/emails/`* (HTML + text twins).
 - **iCal invites:** `icalendar` library; attached to confirmation /
-  reschedule / cancel mails.
+reschedule / cancel mails.
 - **SEO:** full server-side stack - `<title>`, meta description, canonical,
-  robots, OG, Twitter Card, JSON-LD (`Organization`, `WebSite`, `Article`,
-  `BreadcrumbList`, `LocalBusiness`, `Service`), `sitemap.xml` (via
-  `django.contrib.sitemaps`), `robots.txt` (via `django-robots`), RSS feed
-  for the blog.
-- **Security (prod):** HTTPS-only redirect, HSTS, secure cookies,
-  `X-Forwarded-Proto` proxy header trust, `X-Frame-Options: DENY`,
-  `nosniff`, strict referrer policy.
+robots, OG, Twitter Card, JSON-LD (`Organization`, `WebSite`, `Article`,
+`BreadcrumbList`, `LocalBusiness`, `Service`), `sitemap.xml` (via
+`django.contrib.sitemaps`), `robots.txt` (via `django-robots`), RSS feed
+for the blog.
+- **Security (prod):** HTTPS-only redirect, HSTS, secure + SameSite=Strict
+ cookies, `X-Forwarded-Proto` proxy header trust, `X-Frame-Options: DENY`,
+ `nosniff`, strict referrer policy, Content-Security-Policy,
+ Permissions-Policy, Cross-Origin-Opener-Policy, and Cross-Origin-Resource-Policy
+ (the last four emitted from `core.middleware.SecurityHeadersMiddleware`).
+ Public POST endpoints (contact form, newsletter, booking inquiry / create /
+ cancel) are rate-limited via `django-ratelimit`; the Django admin is
+ protected against brute-force logins via `django-axes` (5 failures per
+ IP+username -> 1h lockout). Nginx adds a 10 r/s pool (burst 20) on the
+ application location, blocks dotfiles / sensitive extensions, and limits
+ `/static/` + `/media/` to GET/HEAD. The Gunicorn systemd unit is
+ sandboxed (`ProtectSystem=strict`, `NoNewPrivileges`, restricted syscalls,
+ zeroed capability bounding set).
 - **Errors (optional):** Sentry via `SENTRY_DSN` (loaded only if set).
 
 ### Repo layout
+
 ```
 backend/                         Django project + apps
   manage.py
@@ -73,6 +85,7 @@ md/                              Brand / content reference docs.
 ```
 
 ### Django apps (`INSTALLED_APPS`)
+
 Local apps: `core`, `pages`, `blog`, `contact`, `newsletter`, `scheduling`.
 Third-party: `django-robots`. Plus `django.contrib.sitemaps`, `sites`,
 `syndication`, the usual contrib set.
@@ -82,7 +95,9 @@ imported as `core`, `pages`, ... (NOT `apps.core`). Match this convention
 in new imports and `INSTALLED_APPS` entries.
 
 ### URL surface
+
 Mounted in `backend/elbrus/urls.py`:
+
 - `/`                       - `pages.urls` (home, about, services, contact landing)
 - `/blog/`                  - `blog.urls`
 - `/contact/`               - `contact.urls`
@@ -92,12 +107,13 @@ Mounted in `backend/elbrus/urls.py`:
 - `/sitemap.xml`, `/robots.txt`, `/feed/`, `/healthz`
 
 ### Scheduling app (the most complex piece)
+
 Two parallel paths, both live:
 
 1. **Legacy lead-capture** - `BookingInquiry` model + `services_api` +
-   `inquiry_api`. Customer leaves contact details; we email the inbox.
+  `inquiry_api`. Customer leaves contact details; we email the inbox.
 2. **Real booking calendar** - `AppointmentType` (bookable meeting kinds),
-   `AvailabilityRule` (weekly windows in `SCHEDULING_TIMEZONE`),
+  `AvailabilityRule` (weekly windows in `SCHEDULING_TIMEZONE`),
    `AvailabilityException` (UTC blackouts), `Booking` (UTC start/end,
    status, opaque `manage_token` UUID for self-serve manage/cancel/reschedule).
 
@@ -108,6 +124,7 @@ React island in `frontend/scheduling-island/`. CSRF is enforced on POST
 endpoints (`@csrf_protect`).
 
 Important scheduling settings (env-driven, see `settings/base.py`):
+
 - `SCHEDULING_TIMEZONE` (default `America/New_York`)
 - `SCHEDULING_MIN_LEAD_MINUTES` (default 120)
 - `SCHEDULING_MAX_LEAD_DAYS` (default 60)
@@ -118,34 +135,38 @@ re-check inside `transaction.atomic()`; clients get HTTP 409
 `slot_unavailable` if they lose the race.
 
 ### React scheduling island
+
 - Source: `frontend/scheduling-island/src/` (App, Stepper, Step* screens,
-  api.ts, types.ts, dateUtils.ts).
+api.ts, types.ts, dateUtils.ts).
 - Build output: `backend/static/dist/scheduling/main.js` (referenced from
-  `backend/templates/scheduling/index.html`).
+`backend/templates/scheduling/index.html`).
 - Standalone Vite dev server: `npm run dev` inside the island folder.
 - Production build runs as part of `bootstrap.sh`.
 
 ### Frontend conventions
+
 - Tailwind input: `backend/static/src/styles.css` ->
-  `backend/static/dist/styles.css`. Plugins: `@tailwindcss/forms`,
-  `@tailwindcss/typography`. Built via the standalone Tailwind CLI (no
-  PostCSS pipeline in Django).
-- The base template loads `dist/styles.css`; never hand-edit `dist/*`.
+`backend/static/dist/styles.css`. Plugins: `@tailwindcss/forms`,
+`@tailwindcss/typography`. Built via the standalone Tailwind CLI (no
+PostCSS pipeline in Django).
+- The base template loads `dist/styles.css`; never hand-edit `dist/`*.
 - Don't introduce a global JS framework - the site is intentionally HTML
-  first. New interactivity should either be a small vanilla snippet or a
-  separate island, not a SPA shell.
+first. New interactivity should either be a small vanilla snippet or a
+separate island, not a SPA shell.
 
 ---
 
 ## Local development
 
 ### Prereqs
+
 - Python 3.11+ (the bundled `backend/venv` was created with 3.14).
 - Node.js 20+.
 - PostgreSQL is **not** required locally - dev defaults to SQLite at
-  `backend/db.sqlite3`.
+`backend/db.sqlite3`.
 
 ### One-time setup
+
 ```bash
 python -m venv backend/venv
 backend\venv\Scripts\activate          # Windows PowerShell
@@ -167,38 +188,42 @@ python manage.py runserver             # http://localhost:8000
 ```
 
 ### Day-to-day
+
 - Tailwind watch: `cd backend && npm run watch:css`
 - Island dev server: `cd frontend/scheduling-island && npm run dev`
 - Tests: `cd backend && pytest` (smoke SEO tests + scheduling tests).
 - `python manage.py seed` is idempotent and safe to re-run.
 
 ### Settings selection
+
 - Dev (default in `.env.example`): `DJANGO_SETTINGS_MODULE=elbrus.settings.dev`
   - `DEBUG=True`, console email backend, optional `django-debug-toolbar`.
 - Prod: `DJANGO_SETTINGS_MODULE=elbrus.settings.prod`
   - `DEBUG=False`, WhiteNoise `CompressedManifestStaticFilesStorage`,
-    HSTS, secure cookies, `SECURE_PROXY_SSL_HEADER` set for trust behind Nginx.
+  HSTS, secure cookies, `SECURE_PROXY_SSL_HEADER` set for trust behind Nginx.
 
 ---
 
 ## Deployment
 
 ### Target environment
+
 - **Compute:** single Ubuntu 22.04+ LTS Linux VM on Azure
-  (`Standard_B2s` is the documented baseline).
+(`Standard_B2s` is the documented baseline).
 - **Process model:** `nginx` (TLS termination, static, reverse proxy) ->
-  `gunicorn.socket` -> `gunicorn.service` (3 workers, `--timeout 60`,
-  WSGI app `elbrus.wsgi:application`) running as the `elbrus` system user.
+`gunicorn.socket` -> `gunicorn.service` (3 workers, `--timeout 60`,
+WSGI app `elbrus.wsgi:application`) running as the `elbrus` system user.
 - **DB:** Azure PostgreSQL Flexible Server, private VNet, `sslmode=require`.
 - **TLS:** Let's Encrypt via `certbot --nginx`. Nginx config already
-  reserves `/.well-known/acme-challenge/` at `/var/www/letsencrypt`.
+reserves `/.well-known/acme-challenge/` at `/var/www/letsencrypt`.
 - **Static:** `collectstatic` writes to `/opt/elbrus/app/backend/staticfiles/`,
-  which Nginx serves directly under `/static/`. WhiteNoise also serves
-  them through Gunicorn as a fallback.
+which Nginx serves directly under `/static/`. WhiteNoise also serves
+them through Gunicorn as a fallback.
 - **Logs:** `journalctl -u gunicorn -f` and `/var/log/nginx/*.log`.
 - **Health check:** `GET /healthz` (plain-text template, no DB hit).
 
 ### On-disk layout (VM)
+
 ```
 /opt/elbrus/
   app/                       git checkout (this repo)
@@ -212,17 +237,18 @@ python manage.py runserver             # http://localhost:8000
 ```
 
 ### First-time provisioning
+
 1. Provision VM + PostgreSQL Flexible Server via the Azure CLI snippet in
-   `infra/azure/README.md`.
+  `infra/azure/README.md`.
 2. SSH into the VM, create `/opt/elbrus/app/.env` with prod values
-   (template inlined in `infra/azure/README.md`).
+  (template inlined in `infra/azure/README.md`).
 3. Download and run the bootstrap script:
-   ```bash
+  ```bash
    sudo curl -fsSL .../infra/deploy/bootstrap.sh \
        -o /usr/local/sbin/elbrus-bootstrap
    sudo chmod +x /usr/local/sbin/elbrus-bootstrap
    sudo REPO_URL=... BRANCH=main /usr/local/sbin/elbrus-bootstrap
-   ```
+  ```
 4. Point DNS at the VM, then `sudo certbot --nginx -d <domain> -d www.<domain>`.
 
 `infra/deploy/bootstrap.sh` is fully idempotent. It installs system
@@ -232,10 +258,13 @@ runs `migrate` and `collectstatic`, installs the systemd units +
 Nginx site, and reloads services.
 
 ### Redeploying
+
 The recommended path is just re-running the bootstrap script:
+
 ```bash
 sudo /usr/local/sbin/elbrus-bootstrap
 ```
+
 This does `git pull --ff-only`, reinstalls only changed deps, rebuilds
 assets, runs `migrate --noinput` + `collectstatic --noinput`, then
 `systemctl restart gunicorn.service`. Typical run is 60-120s.
@@ -244,10 +273,12 @@ A manual step-by-step path (when you need to skip / roll back individual
 steps) is documented in `infra/azure/README.md` section 5.
 
 ### Required production env vars
+
 Lives in `/opt/elbrus/app/.env`, loaded by both Django (via
 `environ.Env.read_env`) and the systemd unit (`EnvironmentFile=`).
 
 Must-haves:
+
 - `DJANGO_SETTINGS_MODULE=elbrus.settings.prod`
 - `DJANGO_SECRET_KEY` (50+ random chars)
 - `DJANGO_DEBUG=False`
@@ -255,42 +286,44 @@ Must-haves:
 - `DJANGO_SECURE_SSL_REDIRECT=True`, `DJANGO_SECURE_HSTS_SECONDS=31536000`
 - `DATABASE_URL=postgres://USER:PASS@HOST:5432/elbrus?sslmode=require`
 - `SITE_NAME`, `SITE_URL`, `SITE_DOMAIN`, `SITE_DEFAULT_OG_IMAGE`,
-  `INFO_EMAIL`, `CONTACT_RECIPIENT_EMAIL`
+`INFO_EMAIL`, `CONTACT_RECIPIENT_EMAIL`
 - `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`,
-  `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`
+`EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`
 - Optional: `SCHEDULING_TIMEZONE`, `SCHEDULING_MIN_LEAD_MINUTES`,
-  `SCHEDULING_MAX_LEAD_DAYS`, `SCHEDULING_SLOT_GRANULARITY_MINUTES`,
-  `SENTRY_DSN`.
+`SCHEDULING_MAX_LEAD_DAYS`, `SCHEDULING_SLOT_GRANULARITY_MINUTES`,
+`SENTRY_DSN`.
 
 ### Operational notes
+
 - Treat `/opt/elbrus/app/.env` as a secret (mode 0600, owned by `elbrus`).
 - Postgres backups: enable Azure-managed automated backups on the
-  Flexible Server; bump retention beyond the 7-day default for prod.
+Flexible Server; bump retention beyond the 7-day default for prod.
 - HTTPS-only is enforced both at Nginx (301 from :80) and Django
-  (`SECURE_SSL_REDIRECT`, `SECURE_PROXY_SSL_HEADER`).
+(`SECURE_SSL_REDIRECT`, `SECURE_PROXY_SSL_HEADER`).
 - The Gunicorn unit uses `Type=notify` and a `RuntimeDirectory=elbrus`,
-  so the unix socket dir is auto-created with the right permissions on
-  start.
+so the unix socket dir is auto-created with the right permissions on
+start.
 
 ---
 
 ## Conventions for agents working in this repo
 
 - Don't break the "apps imported by short name" convention - new code
-  should use `from core.seo import ...`, not `from apps.core.seo import ...`.
+should use `from core.seo import ...`, not `from apps.core.seo import ...`.
 - Keep all secrets in `.env` / Azure Key Vault. Never commit
-  `.env`, `db.sqlite3`, `node_modules`, or anything under
-  `backend/static/dist/` or `backend/staticfiles/`.
+`.env`, `db.sqlite3`, `node_modules`, or anything under
+`backend/static/dist/` or `backend/staticfiles/`.
 - New pages must keep SEO parity: extend `core.seo.SeoMixin`, supply
-  `seo_title` / `seo_description`, and add to `core.sitemaps` /
-  `pages.sitemaps` / `blog.sitemaps` as appropriate. The smoke tests in
-  `apps/core/tests/test_smoke_seo.py` will fail if a route loses tags.
+`seo_title` / `seo_description`, and add to `core.sitemaps` /
+`pages.sitemaps` / `blog.sitemaps` as appropriate. The smoke tests in
+`apps/core/tests/test_smoke_seo.py` will fail if a route loses tags.
 - Booking-flow changes need a migration **and** updates to the React
-  island contracts in `frontend/scheduling-island/src/api.ts` /
-  `types.ts`. The island is built into `backend/static/dist/scheduling/`
-  by `npm run build`, which `bootstrap.sh` runs on every redeploy.
+island contracts in `frontend/scheduling-island/src/api.ts` /
+`types.ts`. The island is built into `backend/static/dist/scheduling/`
+by `npm run build`, which `bootstrap.sh` runs on every redeploy.
 - When adding env vars, update **all of**: `.env.example`,
-  `settings/base.py` (with a default), and the prod env template in
-  `infra/azure/README.md`.
+`settings/base.py` (with a default), and the prod env template in
+`infra/azure/README.md`.
 - Prefer editing `infra/deploy/bootstrap.sh` over inventing new deploy
-  steps - it is the single source of truth for "what runs on the VM".
+steps - it is the single source of truth for "what runs on the VM".
+

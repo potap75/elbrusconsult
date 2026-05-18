@@ -24,9 +24,14 @@ SECURE_HSTS_SECONDS = env("DJANGO_SECURE_HSTS_SECONDS")
 SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
 SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0
 
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-X_FRAME_OPTIONS = "DENY"
+# Tighten cookies further in production: no cross-site auth flows exist, so
+# `Strict` is safe and blocks the broadest class of CSRF / login-CSRF tricks.
+SESSION_COOKIE_SAMESITE = "Strict"
+CSRF_COOKIE_SAMESITE = "Strict"
+
+# Pin Cross-Origin-Opener-Policy explicitly (Django 4.2+ defaults to this,
+# but pinning protects us from a future default change).
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 
 # ----------------------------------------------------------------------------
 # Sentry (optional)

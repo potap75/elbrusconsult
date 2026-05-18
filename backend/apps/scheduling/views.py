@@ -31,7 +31,9 @@ from django.utils import timezone as djtz
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
+from django_ratelimit.decorators import ratelimit
 
+from core.net import get_client_ip
 from core.schema import breadcrumb_schema
 from core.seo import SeoMixin
 from pages.models import Service
@@ -44,13 +46,6 @@ from .services.slots import generate_slots, slot_is_available
 logger = logging.getLogger(__name__)
 
 MAX_RANGE_DAYS = 90
-
-
-def _get_client_ip(request: HttpRequest) -> str | None:
-    xff = request.META.get("HTTP_X_FORWARDED_FOR")
-    if xff:
-        return xff.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
 
 
 class ScheduleView(SeoMixin, TemplateView):
@@ -105,6 +100,7 @@ def services_api(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"services": data})
 
 
+@ratelimit(key="ip", rate="10/h", method="POST", block=True)
 @csrf_protect
 @require_POST
 def inquiry_api(request: HttpRequest) -> HttpResponse:
@@ -121,7 +117,7 @@ def inquiry_api(request: HttpRequest) -> HttpResponse:
         )
 
     inquiry = form.save(commit=False)
-    inquiry.ip_address = _get_client_ip(request)
+    inquiry.ip_address = get_client_ip(request)
     inquiry.user_agent = request.META.get("HTTP_USER_AGENT", "")[:500]
     inquiry.save()
 
@@ -186,6 +182,7 @@ def _parse_date(raw: str | None) -> date | None:
         return None
 
 
+@ratelimit(key="ip", rate="120/h", method="GET", block=True)
 @require_GET
 def slots_api(request: HttpRequest) -> JsonResponse:
     """Return UTC ISO-8601 slot start times for an appointment type and date range."""
@@ -251,6 +248,7 @@ def _parse_iso_utc(raw: str | None) -> datetime | None:
     return dt.astimezone(timezone.utc)
 
 
+@ratelimit(key="ip", rate="10/h", method="POST", block=True)
 @csrf_protect
 @require_POST
 def bookings_api(request: HttpRequest) -> HttpResponse:
@@ -363,7 +361,7 @@ def bookings_api(request: HttpRequest) -> HttpResponse:
                 customer_timezone=(payload.get("customer_timezone") or "").strip(),
                 status=Booking.Status.CONFIRMED,
                 rescheduled_from=original_booking,
-                ip_address=_get_client_ip(request),
+                ip_address=get_client_ip(request),
                 user_agent=request.META.get("HTTP_USER_AGENT", "")[:500],
             )
     except IntegrityError:
@@ -392,6 +390,7 @@ def bookings_api(request: HttpRequest) -> HttpResponse:
     )
 
 
+@ratelimit(key="ip", rate="30/h", method="GET", block=True)
 @require_GET
 def booking_lookup_api(request: HttpRequest) -> JsonResponse:
     """Return enough info to pre-fill the island for a reschedule.
@@ -454,6 +453,7 @@ def manage_booking(request: HttpRequest, token: UUID) -> HttpResponse:
     )
 
 
+@ratelimit(key="ip", rate="10/h", method="POST", block=True)
 @csrf_protect
 def cancel_booking(request: HttpRequest, token: UUID) -> HttpResponse:
     if request.method != "POST":

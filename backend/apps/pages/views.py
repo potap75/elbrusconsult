@@ -3,11 +3,11 @@ from __future__ import annotations
 
 from typing import Any
 
-import markdown as md
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView, TemplateView
 
+from core.sanitize import safe_html
 from core.schema import breadcrumb_schema
 from core.seo import SeoMixin
 
@@ -102,13 +102,10 @@ class ServiceDetailView(SeoMixin, DetailView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        body_html = ""
-        if self.object.body_markdown:
-            body_html = md.markdown(
-                self.object.body_markdown,
-                extensions=["extra", "sane_lists", "smarty"],
-            )
-        context["body_html"] = body_html
+        context["body_html"] = safe_html(
+            self.object.body_markdown,
+            extensions=["extra", "sane_lists", "smarty"],
+        )
         context["service_schema"] = {
             "@context": "https://schema.org",
             "@type": "Service",

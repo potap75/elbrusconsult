@@ -1,21 +1,15 @@
 """Blog models: Category, Tag, Post."""
 from __future__ import annotations
 
-import markdown as md
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
-MARKDOWN_EXTENSIONS = [
-    "extra",
-    "sane_lists",
-    "smarty",
-    "toc",
-    "fenced_code",
-    "codehilite",
-]
+from core.sanitize import DEFAULT_MARKDOWN_EXTENSIONS, safe_html
+
+MARKDOWN_EXTENSIONS = DEFAULT_MARKDOWN_EXTENSIONS
 
 
 class Category(models.Model):
@@ -135,11 +129,7 @@ class Post(models.Model):
             and self.published_at is None
         ):
             self.published_at = timezone.now()
-        self.body_html = md.markdown(
-            self.body_markdown,
-            extensions=MARKDOWN_EXTENSIONS,
-            output_format="html5",
-        )
+        self.body_html = safe_html(self.body_markdown, extensions=MARKDOWN_EXTENSIONS)
         super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:

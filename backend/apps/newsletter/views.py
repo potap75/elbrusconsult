@@ -3,12 +3,15 @@ from __future__ import annotations
 from typing import Any
 
 from django.contrib import messages
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.generic import FormView, TemplateView
+from django_ratelimit.decorators import ratelimit
 
+from core.net import get_client_ip
 from core.seo import SeoMixin
 
 from .forms import SubscribeForm
@@ -16,13 +19,10 @@ from .models import Subscriber
 from .services import send_confirmation_email
 
 
-def _get_client_ip(request: HttpRequest) -> str | None:
-    xff = request.META.get("HTTP_X_FORWARDED_FOR")
-    if xff:
-        return xff.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR")
-
-
+@method_decorator(
+    ratelimit(key="ip", rate="5/h", method="POST", block=True),
+    name="post",
+)
 class SubscribeView(SeoMixin, FormView):
     template_name = "newsletter/subscribe.html"
     form_class = SubscribeForm
@@ -39,7 +39,7 @@ class SubscribeView(SeoMixin, FormView):
             email=email,
             defaults={
                 "source": "/newsletter/",
-                "ip_address": _get_client_ip(self.request),
+                "ip_address": get_client_ip(self.request),
             },
         )
         # If they previously unsubscribed, allow them to re-confirm.
