@@ -42,6 +42,12 @@ class BookingInquiry(models.Model):
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=500, blank=True)
 
+    # Marketing attribution snapshot (see contact.ContactMessage.attribution
+    # for shape + provenance). Used to do offline conversion uploads to
+    # Google Ads / LinkedIn / Meta / Microsoft / TikTok when an inquiry
+    # converts into a paid engagement downstream.
+    attribution = models.JSONField(default=dict, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -217,6 +223,11 @@ class Booking(models.Model):
 
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=500, blank=True)
+
+    # Marketing attribution snapshot (see contact.ContactMessage.attribution
+    # for shape + provenance). The presence of ``gclid``/``fbclid``/etc here
+    # is what unlocks offline conversion uploads to Google Ads, Meta, etc.
+    attribution = models.JSONField(default=dict, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -10,6 +10,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import FormView, TemplateView
 from django_ratelimit.decorators import ratelimit
 
+from core.attribution import get_attribution_snapshot
 from core.net import get_client_ip
 from core.schema import breadcrumb_schema
 from core.seo import SeoMixin
@@ -35,6 +36,7 @@ class ContactView(SeoMixin, FormView):
         instance = form.save(commit=False)
         instance.ip_address = get_client_ip(self.request)
         instance.user_agent = self.request.META.get("HTTP_USER_AGENT", "")[:500]
+        instance.attribution = get_attribution_snapshot(self.request)
         instance.save()
 
         try:
@@ -87,3 +89,17 @@ class ContactThanksView(SeoMixin, TemplateView):
     seo_title = "Thanks for reaching out"
     seo_description = "Your message was received. We will reply soon."
     seo_robots = "noindex,follow"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        # GTM-side this becomes a "Lead" conversion. Keep the payload
+        # PII-free: the event marks that a contact message was submitted,
+        # not which one. Sensitive fields stay server-side.
+        context["dataLayer_events"] = [
+            {
+                "event": "contact_form_submit",
+                "form_id": "contact",
+                "conversion_type": "lead",
+            }
+        ]
+        return context

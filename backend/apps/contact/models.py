@@ -14,6 +14,14 @@ class ContactMessage(models.Model):
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.CharField(max_length=500, blank=True)
 
+    # Marketing attribution snapshot. PII-light: UTMs + paid-channel click
+    # IDs + landing page + cross-origin referrer captured by
+    # ``core.middleware.AttributionMiddleware`` and merged via
+    # ``core.attribution.get_attribution_snapshot()``. Shape:
+    #     {"first_touch": {...}, "last_touch": {...}, "current": {...},
+    #      "captured_at": "<iso>"}
+    attribution = models.JSONField(default=dict, blank=True)
+
     handled = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
 

@@ -99,18 +99,18 @@ cat <<'EOF' | sudo tee /opt/elbrus/app/.env > /dev/null
 DJANGO_SETTINGS_MODULE=elbrus.settings.prod
 DJANGO_SECRET_KEY=<generate-a-50-char-random-string>
 DJANGO_DEBUG=False
-DJANGO_ALLOWED_HOSTS=elbruscloud.example,www.elbruscloud.example
-DJANGO_CSRF_TRUSTED_ORIGINS=https://elbruscloud.example,https://www.elbruscloud.example
+DJANGO_ALLOWED_HOSTS=elbruscloud.com,www.elbruscloud.com
+DJANGO_CSRF_TRUSTED_ORIGINS=https://elbruscloud.com,https://www.elbruscloud.com
 DJANGO_SECURE_SSL_REDIRECT=True
 DJANGO_SECURE_HSTS_SECONDS=31536000
 
 SITE_NAME=Elbrus Cloud
 SITE_TAGLINE=Cloud Engineering & Cybersecurity Excellence
-SITE_DOMAIN=elbruscloud.example
-SITE_URL=https://elbruscloud.example
+SITE_DOMAIN=elbruscloud.com
+SITE_URL=https://elbruscloud.com
 SITE_DEFAULT_OG_IMAGE=/static/img/og-default.png
-INFO_EMAIL=info@elbruscloud.example
-CONTACT_RECIPIENT_EMAIL=info@elbruscloud.example
+INFO_EMAIL=info@elbruscloud.com
+CONTACT_RECIPIENT_EMAIL=info@elbruscloud.com
 
 DATABASE_URL=postgres://elbrusdba:<password>@elbrus-pg.postgres.database.azure.com:5432/elbrus?sslmode=require
 
@@ -119,7 +119,32 @@ EMAIL_PORT=587
 EMAIL_HOST_USER=<smtp-user>
 EMAIL_HOST_PASSWORD=<smtp-pass>
 EMAIL_USE_TLS=True
-DEFAULT_FROM_EMAIL=Elbrus Cloud <no-reply@elbruscloud.example>
+DEFAULT_FROM_EMAIL=Elbrus Cloud <no-reply@elbruscloud.com>
+
+# Analytics & paid-channel tag manager (all optional; tags only render when set)
+# GTM is the single source of truth for marketing pixels — configure GA4,
+# Google Ads, LinkedIn Insight, Meta Pixel, Microsoft UET, and TikTok Pixel
+# INSIDE the GTM container, not as separate <script> tags in this repo.
+GTM_CONTAINER_ID=GTM-XXXXXXX
+GA4_MEASUREMENT_ID=
+GOOGLE_ADS_CONVERSION_ID=
+LINKEDIN_PARTNER_ID=
+META_PIXEL_ID=
+BING_UET_TAG_ID=
+TIKTOK_PIXEL_ID=
+
+# Search engine site verification (paste the meta-tag CONTENT value only)
+GOOGLE_SITE_VERIFICATION=
+BING_SITE_VERIFICATION=
+
+# Google Consent Mode v2: deny by default (privacy-by-default; consent
+# banner upgrades to granted on user accept). CONSENT_DEFAULT_DENY_REGIONS
+# is optional; useful only if you ever set CONSENT_DEFAULT_GRANTED=True.
+CONSENT_DEFAULT_GRANTED=False
+CONSENT_DEFAULT_DENY_REGIONS=
+
+# First-touch attribution cookie lifetime (days). 90 = Google Ads default.
+ATTRIBUTION_COOKIE_DAYS=90
 EOF
 sudo chmod 600 /opt/elbrus/app/.env
 ```
@@ -151,7 +176,7 @@ installs and starts the Gunicorn systemd units and the Nginx site.
 Once DNS points at the VM:
 
 ```bash
-sudo certbot --nginx -d elbruscloud.example -d www.elbruscloud.example
+sudo certbot --nginx -d elbruscloud.com -d www.elbruscloud.com
 ```
 
 Certbot will edit the Nginx config in place and set up automatic renewal.
@@ -268,7 +293,7 @@ sudo nginx -t && sudo systemctl reload nginx
 journalctl -u gunicorn -f
 
 # Quick HTTP health check
-curl -sf https://elbruscloud.example/healthz && echo "OK"
+curl -sf https://elbruscloud.com/healthz && echo "OK"
 ```
 
 ---
@@ -297,7 +322,7 @@ those directives intentionally.
 ## 7. Operational notes
 
 - **Logs:** `journalctl -u gunicorn -f` and `/var/log/nginx/*.log`.
-- **Health check:** `https://elbruscloud.example/healthz`.
+- **Health check:** `https://elbruscloud.com/healthz`.
 - **Backups:** Configure Azure-managed automated backups on the Flexible
   Server. Default retention is 7 days; bump for production.
 - **Secrets:** Treat `/opt/elbrus/app/.env` as a secret. Mode 600, owned by

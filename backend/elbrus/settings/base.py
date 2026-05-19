@@ -53,14 +53,57 @@ SITE_NAME = env("SITE_NAME", default="Elbrus Cloud")
 SITE_TAGLINE = env(
     "SITE_TAGLINE", default="Cloud Engineering & Cybersecurity Excellence"
 )
-SITE_DOMAIN = env("SITE_DOMAIN", default="localhost:8000")
-SITE_URL = env("SITE_URL", default="http://localhost:8000").rstrip("/")
+SITE_DOMAIN = env("SITE_DOMAIN", default="elbruscloud.com")
+SITE_URL = env("SITE_URL", default="https://elbruscloud.com").rstrip("/")
 SITE_DEFAULT_OG_IMAGE = env(
     "SITE_DEFAULT_OG_IMAGE", default="/static/img/og-default.png"
 )
 SITE_TWITTER_HANDLE = env("SITE_TWITTER_HANDLE", default="")
-INFO_EMAIL = env("INFO_EMAIL", default="info@elbruscloud.example")
+INFO_EMAIL = env("INFO_EMAIL", default="info@elbruscloud.com")
 CONTACT_RECIPIENT_EMAIL = env("CONTACT_RECIPIENT_EMAIL", default=INFO_EMAIL)
+
+# ----------------------------------------------------------------------------
+# Analytics, Tag Manager & paid channels
+# ----------------------------------------------------------------------------
+# Every ID below is opt-in: when the env var is empty, the corresponding
+# script tag is NOT rendered and no third-party request is made. This keeps
+# dev / preview environments completely tracker-free by default and means a
+# half-configured production deploy can't leak data to vendors.
+#
+# Strategy: GTM is the single source of truth for tag delivery in production.
+# Direct GA4 (G-...) is supported as a fallback for environments that don't
+# want to maintain a GTM container. When both are set, GTM wins and GA4
+# fires through the GTM container instead of via gtag.js directly.
+GTM_CONTAINER_ID = env("GTM_CONTAINER_ID", default="")           # GTM-XXXXXXX
+GA4_MEASUREMENT_ID = env("GA4_MEASUREMENT_ID", default="")       # G-XXXXXXXXXX
+GOOGLE_ADS_CONVERSION_ID = env(
+    "GOOGLE_ADS_CONVERSION_ID", default=""
+)                                                                 # AW-XXXXXXXXX
+LINKEDIN_PARTNER_ID = env("LINKEDIN_PARTNER_ID", default="")
+META_PIXEL_ID = env("META_PIXEL_ID", default="")
+BING_UET_TAG_ID = env("BING_UET_TAG_ID", default="")
+TIKTOK_PIXEL_ID = env("TIKTOK_PIXEL_ID", default="")
+
+# Search-engine site verification meta tags (rendered into <head> only when set)
+GOOGLE_SITE_VERIFICATION = env("GOOGLE_SITE_VERIFICATION", default="")
+BING_SITE_VERIFICATION = env("BING_SITE_VERIFICATION", default="")
+
+# Google Consent Mode v2 defaults. We default to denied everywhere
+# (privacy-by-default; Consent Mode still lets Google Ads do conversion
+# modeling). If you ever want implied consent outside specific regions,
+# leave CONSENT_DEFAULT_DENY_REGIONS empty and set CONSENT_DEFAULT_GRANTED=True.
+CONSENT_DEFAULT_GRANTED = env.bool("CONSENT_DEFAULT_GRANTED", default=False)
+CONSENT_DEFAULT_DENY_REGIONS = env.list(
+    "CONSENT_DEFAULT_DENY_REGIONS", default=[]
+)
+
+# ----------------------------------------------------------------------------
+# Attribution (UTM / click-ID capture for paid channels)
+# ----------------------------------------------------------------------------
+# First-touch cookie lives this many days (industry standard ~ 90).
+ATTRIBUTION_COOKIE_DAYS = env.int("ATTRIBUTION_COOKIE_DAYS", default=90)
+ATTRIBUTION_FIRST_TOUCH_COOKIE = "elb_attr_first"
+ATTRIBUTION_LAST_TOUCH_COOKIE = "elb_attr_last"
 
 # ----------------------------------------------------------------------------
 # Scheduling (booking calendar)
@@ -116,6 +159,10 @@ ROBOTS_SITEMAP_URLS = [f"{SITE_URL}/sitemap.xml"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # SecurityHeadersMiddleware MUST run early so it can attach a per-request
+    # CSP nonce to the request BEFORE templates render. The CSP header itself
+    # is set on the response on the way back out (default-setdefault, so
+    # other layers can override).
     "core.middleware.SecurityHeadersMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -124,6 +171,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # AttributionMiddleware reads ?utm_*/gclid/fbclid/li_fat_id/ttclid/msclkid
+    # from the request and persists first/last-touch attribution cookies.
+    # It must run AFTER SessionMiddleware (no session dep today, but cheap
+    # insurance) and BEFORE any view that wants to read the attribution
+    # snapshot off the request.
+    "core.middleware.AttributionMiddleware",
     # django-axes must be the LAST middleware in the stack so that it sees
     # the request after authentication has populated request.user.
     "axes.middleware.AxesMiddleware",
@@ -150,6 +203,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.site_context",
+                "core.context_processors.analytics_context",
             ],
         },
     },

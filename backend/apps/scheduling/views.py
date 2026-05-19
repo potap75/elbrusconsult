@@ -33,6 +33,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView
 from django_ratelimit.decorators import ratelimit
 
+from core.attribution import get_attribution_snapshot
 from core.net import get_client_ip
 from core.schema import breadcrumb_schema
 from core.seo import SeoMixin
@@ -119,6 +120,7 @@ def inquiry_api(request: HttpRequest) -> HttpResponse:
     inquiry = form.save(commit=False)
     inquiry.ip_address = get_client_ip(request)
     inquiry.user_agent = request.META.get("HTTP_USER_AGENT", "")[:500]
+    inquiry.attribution = get_attribution_snapshot(request)
     inquiry.save()
 
     try:
@@ -363,6 +365,7 @@ def bookings_api(request: HttpRequest) -> HttpResponse:
                 rescheduled_from=original_booking,
                 ip_address=get_client_ip(request),
                 user_agent=request.META.get("HTTP_USER_AGENT", "")[:500],
+                attribution=get_attribution_snapshot(request),
             )
     except IntegrityError:
         return JsonResponse(

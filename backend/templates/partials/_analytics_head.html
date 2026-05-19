@@ -1,0 +1,91 @@
+{% load seo_tags %}{% spaceless %}
+{# ------------------------------------------------------------------ #}
+{# Site verification meta tags (only render when configured)          #}
+{# ------------------------------------------------------------------ #}
+{% if GOOGLE_SITE_VERIFICATION %}<meta name="google-site-verification" content="{{ GOOGLE_SITE_VERIFICATION }}">{% endif %}
+{% if BING_SITE_VERIFICATION %}<meta name="msvalidate.01" content="{{ BING_SITE_VERIFICATION }}">{% endif %}
+{% endspaceless %}
+
+{% if GTM_CONTAINER_ID or GA4_MEASUREMENT_ID %}
+{# ------------------------------------------------------------------ #}
+{# Google Consent Mode v2 — MUST run BEFORE any tag fires.            #}
+{# Defaults every consent signal to denied. The consent banner JS     #}
+{# updates these once the visitor accepts. While denied, GTM/GA4      #}
+{# still load but throttle to cookieless pings used by Google's       #}
+{# conversion modeling.                                                #}
+{# ------------------------------------------------------------------ #}
+<script{% csp_nonce_attr %}>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  window.gtag = gtag;
+  gtag("consent", "default", {
+    ad_storage:           {% if CONSENT_DEFAULT_GRANTED %}"granted"{% else %}"denied"{% endif %},
+    ad_user_data:         {% if CONSENT_DEFAULT_GRANTED %}"granted"{% else %}"denied"{% endif %},
+    ad_personalization:   {% if CONSENT_DEFAULT_GRANTED %}"granted"{% else %}"denied"{% endif %},
+    analytics_storage:    {% if CONSENT_DEFAULT_GRANTED %}"granted"{% else %}"denied"{% endif %},
+    functionality_storage:"granted",
+    security_storage:     "granted",
+    wait_for_update:      500{% if CONSENT_DEFAULT_DENY_REGIONS %},
+    region: [{% for region in CONSENT_DEFAULT_DENY_REGIONS %}"{{ region }}"{% if not forloop.last %},{% endif %}{% endfor %}]{% endif %}
+  });
+  gtag("set", "ads_data_redaction", true);
+  gtag("set", "url_passthrough", true);
+</script>
+{% endif %}
+
+{% if GTM_CONTAINER_ID %}
+{# ------------------------------------------------------------------ #}
+{# Google Tag Manager container loader.                                #}
+{# Single source of truth for ALL marketing/analytics tags in prod:   #}
+{# GA4, Google Ads, LinkedIn Insight, Meta Pixel, Bing UET, TikTok    #}
+{# Pixel. Configure each tag inside the GTM container (NOT here).     #}
+{# ------------------------------------------------------------------ #}
+<script{% csp_nonce_attr %}>
+  (function(w,d,s,l,i,n){w[l]=w[l]||[];w[l].push({"gtm.start":new Date().getTime(),event:"gtm.js"});
+  var f=d.getElementsByTagName(s)[0],j=d.createElement(s);
+  j.async=true;j.src="https://www.googletagmanager.com/gtm.js?id="+i;
+  if(n){j.setAttribute("nonce",n);}
+  f.parentNode.insertBefore(j,f);})(window,document,"script","dataLayer","{{ GTM_CONTAINER_ID }}","{{ csp_nonce }}");
+</script>
+{% elif GA4_MEASUREMENT_ID %}
+{# GA4 direct fallback for environments that don't run GTM.           #}
+<script{% csp_nonce_attr %} src="https://www.googletagmanager.com/gtag/js?id={{ GA4_MEASUREMENT_ID }}" async></script>
+<script{% csp_nonce_attr %}>
+  gtag("js", new Date());
+  gtag("config", "{{ GA4_MEASUREMENT_ID }}", { anonymize_ip: true });
+</script>
+{% endif %}
+
+{% if dataLayer_events %}
+{# View-supplied dataLayer events (server-rendered conversion pages   #}
+{# push their event here so GTM can pick them up before the user     #}
+{# navigates away).                                                   #}
+<script{% csp_nonce_attr %}>
+  window.dataLayer = window.dataLayer || [];
+  {% for event in dataLayer_events %}dataLayer.push({{ event|safe }});
+  {% endfor %}
+</script>
+{% endif %}
+
+{# ------------------------------------------------------------------ #}
+{# Cross-channel tracking helper. window.elbrusTrack(name, payload)   #}
+{# is the single client-side conversion API: the React scheduling    #}
+{# island, contact-form success state, and any future widget should  #}
+{# call it instead of calling gtag/fbq/lintrk directly. This keeps   #}
+{# vendor-specific code inside GTM where it belongs.                 #}
+{# ------------------------------------------------------------------ #}
+<script{% csp_nonce_attr %}>
+  window.dataLayer = window.dataLayer || [];
+  window.elbrusTrack = function (name, payload) {
+    if (!name) { return; }
+    var event = { event: String(name) };
+    if (payload && typeof payload === "object") {
+      for (var k in payload) {
+        if (Object.prototype.hasOwnProperty.call(payload, k)) {
+          event[k] = payload[k];
+        }
+      }
+    }
+    window.dataLayer.push(event);
+  };
+</script>

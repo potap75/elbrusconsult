@@ -7,6 +7,10 @@
 
   {% include "partials/_meta.html" %}
 
+  {# Analytics + Consent Mode v2 bootstrap. Must run BEFORE any other       #}
+  {# script so that GTM/GA4 see the default consent state on first tick.   #}
+  {% include "partials/_analytics_head.html" %}
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
@@ -23,6 +27,8 @@
   {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased flex flex-col">
+  {% include "partials/_analytics_body.html" %}
+
   <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-white focus:px-3 focus:py-2 focus:rounded focus:shadow">Skip to main content</a>
 
   {% include "partials/_nav.html" %}
@@ -33,7 +39,9 @@
 
   {% include "partials/_footer.html" %}
 
-  <script src="{% static 'src/app.js' %}" defer></script>
+  {% include "partials/_consent_banner.html" %}
+
+  <script{% csp_nonce_attr %} src="{% static 'src/app.js' %}" defer></script>
   {% block extra_body %}{% endblock %}
 </body>
 </html>

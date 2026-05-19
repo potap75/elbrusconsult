@@ -31,11 +31,29 @@ robots, OG, Twitter Card, JSON-LD (`Organization`, `WebSite`, `Article`,
 `BreadcrumbList`, `LocalBusiness`, `Service`), `sitemap.xml` (via
 `django.contrib.sitemaps`), `robots.txt` (via `django-robots`), RSS feed
 for the blog.
+- **Analytics / paid channels:** Google Tag Manager is the single source of
+truth for ALL marketing tags in production. GA4, Google Ads, LinkedIn
+Insight, Meta Pixel, Microsoft UET, and TikTok Pixel are configured INSIDE
+the GTM container, not as separate `<script>` tags in this repo. Direct
+GA4 is supported as a fallback for environments that don't run GTM.
+Google Consent Mode v2 is wired in front of every tag with a default-deny
+posture (the `partials/_consent_banner.html` updates state on user
+acceptance). Every tag is gated on its env var being set: a deploy that
+forgets to set `GTM_CONTAINER_ID` emits ZERO third-party requests.
+- **Attribution:** `core.middleware.AttributionMiddleware` captures the UTM
+5-tuple plus paid-channel click IDs (`gclid`, `gbraid`, `wbraid`, `fbclid`,
+`li_fat_id`, `msclkid`, `ttclid`) into HttpOnly first/last-touch cookies.
+Views call `core.attribution.get_attribution_snapshot(request)` to persist
+the merged snapshot to the `attribution` JSONField on `ContactMessage`,
+`BookingInquiry`, and `Booking`. This enables offline conversion uploads
+from converted bookings back to Google Ads / Meta / LinkedIn / etc.
 - **Security (prod):** HTTPS-only redirect, HSTS, secure + SameSite=Strict
  cookies, `X-Forwarded-Proto` proxy header trust, `X-Frame-Options: DENY`,
- `nosniff`, strict referrer policy, Content-Security-Policy,
- Permissions-Policy, Cross-Origin-Opener-Policy, and Cross-Origin-Resource-Policy
- (the last four emitted from `core.middleware.SecurityHeadersMiddleware`).
+ `nosniff`, strict referrer policy, Content-Security-Policy (per-request
+ nonce + vendor allow-list for GTM/GA4/Google Ads/LinkedIn/Meta/Microsoft
+ UET/TikTok), Permissions-Policy, Cross-Origin-Opener-Policy, and
+ Cross-Origin-Resource-Policy (the last four emitted from
+ `core.middleware.SecurityHeadersMiddleware`).
  Public POST endpoints (contact form, newsletter, booking inquiry / create /
  cancel) are rate-limited via `django-ratelimit`; the Django admin is
  protected against brute-force logins via `django-axes` (5 failures per
@@ -153,6 +171,17 @@ PostCSS pipeline in Django).
 - Don't introduce a global JS framework - the site is intentionally HTML
 first. New interactivity should either be a small vanilla snippet or a
 separate island, not a SPA shell.
+- **Inline scripts must carry a CSP nonce.** Use `{% csp_nonce_attr %}` (or
+`nonce="{{ csp_nonce }}"`) inside any `<script>` tag rendered from a
+template. The nonce comes from `SecurityHeadersMiddleware`. Loader URLs
+constructed inside inline scripts should also propagate the nonce to any
+`<script>` elements they create (see the GTM loader in
+`partials/_analytics_head.html` for the canonical pattern).
+- **Conversion tracking from JS goes through `window.elbrusTrack(name,
+payload)`** - never call `gtag`, `fbq`, `lintrk`, `ttq`, etc. directly.
+The shim pushes a normalised event onto `dataLayer` and GTM fans it out
+to the right vendor. Tracking is no-op when no analytics IDs are
+configured, so the call site doesn't need to guard.
 
 ---
 
@@ -328,6 +357,24 @@ by `npm run build`, which `bootstrap.sh` runs on every redeploy.
 - When adding env vars, update **all of**: `.env.example`,
 `settings/base.py` (with a default), and the prod env template in
 `infra/azure/README.md`.
+- **New conversion events** must (a) fire via `window.elbrusTrack` (JS) or
+the view's `dataLayer_events` context var (server-rendered thanks pages),
+(b) be documented in this file, and (c) NOT include PII in the payload.
+The event name + a coarse `conversion_type` is enough; GTM enriches from
+its own dataLayer state.
+- **Lead-capture forms must persist `attribution`.** Any new model that
+captures a lead/conversion (contact, booking, newsletter, demo request,
+etc.) needs an `attribution = models.JSONField(default=dict, blank=True)`
+column wired with `get_attribution_snapshot(request)` in the view that
+creates the row. Without this, paid-channel offline conversion uploads
+cannot work.
+- **Site verification & analytics IDs are opt-in.** All tag templates are
+gated on the corresponding env var being non-empty. Adding a new tag
+vendor requires adding the env var, the conditional in
+`partials/_analytics_head.html`, the new vendor host in the CSP allow-list
+inside `core.middleware._SCRIPT_SRC_VENDORS` / `_CONNECT_SRC_VENDORS` /
+`_IMG_SRC_VENDORS`, and a test asserting the tag does and does not render
+based on the env var.
 - Prefer editing `infra/deploy/bootstrap.sh` over inventing new deploy
 steps - it is the single source of truth for "what runs on the VM".
 

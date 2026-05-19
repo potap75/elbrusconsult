@@ -74,6 +74,18 @@ class ConfirmView(SeoMixin, TemplateView):
             subscriber.save(update_fields=["confirmed_at", "unsubscribed_at"])
         return self.render_to_response(self.get_context_data(subscriber=subscriber))
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        # Treat double-opt-in confirmation as the real conversion event
+        # (not the initial form POST). Cleaner Google Ads / Meta data.
+        context["dataLayer_events"] = [
+            {
+                "event": "newsletter_subscribe_confirmed",
+                "conversion_type": "subscribe",
+            }
+        ]
+        return context
+
 
 class UnsubscribeView(SeoMixin, TemplateView):
     template_name = "newsletter/unsubscribed.html"

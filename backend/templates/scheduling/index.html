@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static seo_tags %}
 
 {% block content %}
   <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-20">
@@ -45,5 +45,5 @@
 {% block extra_body %}
   {# Vite-built React island. ``collectstatic`` copies it from static/dist/scheduling/. #}
   <link rel="modulepreload" href="{% static 'dist/scheduling/main.js' %}">
-  <script type="module" src="{% static 'dist/scheduling/main.js' %}" defer></script>
+  <script type="module"{% csp_nonce_attr %} src="{% static 'dist/scheduling/main.js' %}" defer></script>
 {% endblock %}

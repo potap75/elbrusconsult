@@ -1,0 +1,10 @@
+{% if GTM_CONTAINER_ID %}
+{# GTM no-script fallback. Allows GTM to record a pageview even if   #}
+{# the visitor has JavaScript disabled. Iframe sandbox is restricted #}
+{# to the GTM container; CSP frame-src is configured to allow this.  #}
+<noscript>
+  <iframe src="https://www.googletagmanager.com/ns.html?id={{ GTM_CONTAINER_ID }}"
+          height="0" width="0" style="display:none;visibility:hidden"
+          title="Google Tag Manager"></iframe>
+</noscript>
+{% endif %}
