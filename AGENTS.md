@@ -40,6 +40,12 @@ Google Consent Mode v2 is wired in front of every tag with a default-deny
 posture (the `partials/_consent_banner.html` updates state on user
 acceptance). Every tag is gated on its env var being set: a deploy that
 forgets to set `GTM_CONTAINER_ID` emits ZERO third-party requests.
+The GTM container itself is versioned in this repo at
+`infra/gtm/elbruscloud-container-v1.json`. Treat that file as the source
+of truth: when you change something in the GTM UI, export the container
+and overwrite the JSON; when you need to provision a fresh container,
+import the JSON via Admin -> Import Container (Merge + Overwrite). See
+`infra/gtm/README.md` for the full import workflow.
 - **Attribution:** `core.middleware.AttributionMiddleware` captures the UTM
 5-tuple plus paid-channel click IDs (`gclid`, `gbraid`, `wbraid`, `fbclid`,
 `li_fat_id`, `msclkid`, `ttclid`) into HttpOnly first/last-touch cookies.
