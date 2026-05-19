@@ -103,4 +103,4 @@ sudo systemctl reload nginx
 
 log "Bootstrap complete."
 log "Next steps: point DNS at this VM, then run:"
-log "  sudo certbot --nginx -d elbruscloud.example -d www.elbruscloud.example"
+log "  sudo certbot --nginx -d elbruscloud.com -d www.elbruscloud.com"
