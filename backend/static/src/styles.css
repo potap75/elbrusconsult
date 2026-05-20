@@ -38,4 +38,164 @@
            text-slate-700 font-medium hover:bg-slate-100 focus:outline-none
            focus:ring-2 focus:ring-summit-500 focus:ring-offset-2;
   }
+
+  /* ---------------------------------------------------------------------
+   * Home page "Areas of expertise" - card + icon tile primitives.
+   * The cards layer a soft glass background over the topographic
+   * section background and lift slightly on hover. The icon tile is
+   * a small gradient logo that sits at the top of each card.
+   * ------------------------------------------------------------------- */
+  .card-glass {
+    @apply relative overflow-hidden rounded-2xl;
+    /* Layer 1: a soft white -> slate gradient fill (the "glass"). */
+    /* Layer 2: a 1px gradient border drawn via background-clip on the */
+    /* border itself. Two layers + transparent border = a real gradient */
+    /* stroke that scales correctly with border-radius.                */
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(248, 250, 252, 0.88) 100%) padding-box,
+      linear-gradient(135deg, rgba(15, 77, 140, 0.35) 0%, rgba(52, 145, 185, 0.25) 50%, rgba(15, 77, 140, 0.1) 100%) border-box;
+    border: 1px solid transparent;
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 8px 24px -16px rgba(15, 77, 140, 0.18);
+    transition:
+      transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(6px);
+  }
+
+  .card-glass:hover,
+  .card-glass:focus-within {
+    transform: translateY(-2px);
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 18px 36px -18px rgba(15, 77, 140, 0.45);
+  }
+
+  /* Decorative glow that follows the top edge of the card on hover. */
+  .card-glass-glow {
+    position: absolute;
+    inset: -40% -10% auto -10%;
+    height: 80%;
+    pointer-events: none;
+    background: radial-gradient(
+      60% 80% at 50% 0%,
+      rgba(52, 145, 185, 0.35) 0%,
+      rgba(52, 145, 185, 0) 60%
+    );
+    opacity: 0;
+    transition: opacity 280ms ease;
+  }
+  .card-glass:hover .card-glass-glow,
+  .card-glass:focus-within .card-glass-glow {
+    opacity: 1;
+  }
+
+  /* Gradient fill for the icon tile. Color stops walk the summit ->
+   * glacier palette so it reads as part of the same brand family as
+   * the hero, just lighter / more "lit". The inner highlight is the
+   * inset shadow from theme.boxShadow["tile-glow"].
+   */
+  .tile-gradient {
+    background: linear-gradient(
+      135deg,
+      #0f4d8c 0%,
+      #2d6ab7 45%,
+      #3491b9 100%
+    );
+    position: relative;
+  }
+  /* Subtle inner highlight at the top-left of the tile so it doesn't
+   * look completely flat. Drawn as a pseudo so we don't fight the
+   * shadow-tile-glow utility that ships the outer/edge effects.
+   */
+  .tile-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      80% 60% at 25% 15%,
+      rgba(255, 255, 255, 0.35) 0%,
+      rgba(255, 255, 255, 0) 70%
+    );
+    pointer-events: none;
+  }
+
+  /* Topographic / contour-line background for the expertise section.
+   * The SVG is a 240x240 tile with two soft contour curves drawn in
+   * summit-300 at 6% opacity. Tiled across the section it reads like
+   * a faint topographic map. A second radial gradient (::after) lights
+   * the upper-left so the card grid sits in front of a soft glow.
+   */
+  .topographic-bg {
+    background-color: #f8fafc;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240' fill='none' stroke='%237faddc' stroke-width='1' stroke-opacity='0.18'><path d='M-20 60 C 40 20, 100 100, 160 60 S 280 100, 340 60'/><path d='M-20 100 C 40 60, 100 140, 160 100 S 280 140, 340 100'/><path d='M-20 140 C 40 100, 100 180, 160 140 S 280 180, 340 140'/><path d='M-20 180 C 40 140, 100 220, 160 180 S 280 220, 340 180'/></svg>");
+    background-size: 240px 240px;
+    background-repeat: repeat;
+    background-position: center;
+  }
+  .topographic-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      60% 50% at 15% 0%,
+      rgba(52, 145, 185, 0.10) 0%,
+      rgba(52, 145, 185, 0) 70%
+    ),
+    radial-gradient(
+      40% 40% at 100% 100%,
+      rgba(15, 77, 140, 0.08) 0%,
+      rgba(15, 77, 140, 0) 70%
+    );
+    pointer-events: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Reveal-on-scroll utilities. The companion JS in static/src/app.js attaches
+ * `is-visible` when an element enters the viewport, which switches the
+ * animation on. The @keyframes is duplicated from tailwind.config.js
+ * because Tailwind's JIT only emits keyframe blocks when a corresponding
+ * `animate-<name>` utility appears in the scanned markup, and we toggle
+ * the class from JS (not from a static class), so we declare it here too.
+ * ------------------------------------------------------------------------- */
+@keyframes reveal {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(12px);
+    will-change: opacity, transform;
+  }
+  [data-reveal].is-visible {
+    animation: reveal 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Honor user motion preferences. When the user has asked for reduced
+ * motion we disable every transition / animation we added above and just
+ * show the final state. Static layout is unchanged.
+ * ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .card-glass {
+    transition: none !important;
+  }
+  .card-glass:hover,
+  .card-glass:focus-within {
+    transform: none !important;
+  }
+  .card-glass-glow {
+    transition: none !important;
+  }
 }

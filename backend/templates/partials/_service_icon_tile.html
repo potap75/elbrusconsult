@@ -1,0 +1,8 @@
+{% load icons %}{% comment %}
+Renders a small gradient tile with a Heroicon centered inside. The icon
+itself is decorative (aria-hidden); the surrounding heading is what
+conveys meaning to assistive tech. Context: `icon` - the Heroicon name
+(string). Falls back to "sparkles" if unset or unknown.
+{% endcomment %}<span class="tile-gradient inline-flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-tile-glow ring-1 ring-white/15">
+  {% heroicon icon|default:"sparkles" class="h-7 w-7" %}
+</span>

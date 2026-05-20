@@ -10,6 +10,9 @@
               fill="currentColor" class="text-summit-500"/>
       </svg>
     </div>
+    {# Soft handoff into the slate-50 "Areas of expertise" section below. #}
+    <div class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-slate-50/15"
+         aria-hidden="true"></div>
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
       <p class="text-summit-200 text-sm font-semibold uppercase tracking-wider">{{ SITE_NAME }}</p>
@@ -34,30 +37,42 @@
     </div>
   </section>
 
-  <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
-    <header class="max-w-2xl">
-      <h2 class="text-3xl font-bold tracking-tight text-slate-900">Areas of expertise</h2>
-      <p class="mt-3 text-slate-600">
-        From risk assessment to recovery, we cover the full security lifecycle. Every
-        engagement is tailored to your environment, threat model, and goals.
-      </p>
-    </header>
+  <section class="relative isolate overflow-hidden bg-slate-50">
+    {# Decorative topographic + radial-glow background. Decorative only. #}
+    <div class="topographic-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
 
-    <ul class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {% for service in all_services %}
-        <li class="group relative rounded-lg border border-slate-200 bg-white p-6 hover:border-summit-400 hover:shadow-md transition">
-          <p class="text-sm font-semibold uppercase tracking-wide text-summit-700">{{ service.icon|default:"" }}</p>
-          <h3 class="mt-2 text-lg font-semibold text-slate-900">
-            <a href="{{ service.get_absolute_url }}" class="after:absolute after:inset-0 group-hover:text-summit-700">
-              {{ service.name }}
-            </a>
-          </h3>
-          <p class="mt-2 text-sm text-slate-600">{{ service.tagline }}</p>
-        </li>
-      {% empty %}
-        <li class="text-slate-600">Service catalog coming soon.</li>
-      {% endfor %}
-    </ul>
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 lg:py-24">
+      <header class="max-w-2xl" data-reveal="card">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-summit-600">What we do</p>
+        <h2 class="mt-3 font-display text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
+          Areas of expertise
+        </h2>
+        <p class="mt-4 text-slate-600 text-lg leading-relaxed">
+          From risk assessment to recovery, we cover the full security lifecycle. Every
+          engagement is tailored to your environment, threat model, and goals.
+        </p>
+      </header>
+
+      <ul class="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for service in all_services %}
+          <li class="card-glass group relative flex flex-col gap-4 p-6"
+              data-reveal="card"
+              data-reveal-stagger="{{ forloop.counter0 }}">
+            {% include "partials/_service_icon_tile.html" with icon=service.icon %}
+            <h3 class="font-display text-lg font-semibold tracking-tight text-slate-900">
+              <a href="{{ service.get_absolute_url }}"
+                 class="after:absolute after:inset-0 after:rounded-2xl after:content-[''] group-hover:text-summit-700 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-summit-500 focus-visible:after:ring-offset-2 focus-visible:after:ring-offset-white">
+                {{ service.name }}
+              </a>
+            </h3>
+            <p class="text-sm leading-relaxed text-slate-600">{{ service.tagline }}</p>
+            <span class="card-glass-glow" aria-hidden="true"></span>
+          </li>
+        {% empty %}
+          <li class="text-slate-600">Service catalog coming soon.</li>
+        {% endfor %}
+      </ul>
+    </div>
   </section>
 
   <section class="bg-slate-50 border-y border-slate-200">

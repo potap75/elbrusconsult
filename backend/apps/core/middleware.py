@@ -109,6 +109,13 @@ _FRAME_SRC_VENDORS = (
     "https://bid.g.doubleclick.net",
 )
 
+# Google Fonts CSS is fetched from fonts.googleapis.com (style-src) and the
+# actual .woff2 files from fonts.gstatic.com (font-src). Both endpoints are
+# CORS-friendly and HTTPS-only; they are not user-content surfaces, so the
+# scope here stays narrow.
+_STYLE_SRC_VENDORS = ("https://fonts.googleapis.com",)
+_FONT_SRC_VENDORS = ("https://fonts.gstatic.com",)
+
 _PERMISSIONS_POLICY = ", ".join(
     [
         "camera=()",
@@ -133,18 +140,20 @@ def _build_csp(nonce: str) -> str:
     connect_src = " ".join(("'self'", *_CONNECT_SRC_VENDORS))
     img_src = " ".join(("'self'", "data:", *_IMG_SRC_VENDORS))
     frame_src = " ".join(("'self'", *_FRAME_SRC_VENDORS))
+    style_src = " ".join(("'self'", "'unsafe-inline'", *_STYLE_SRC_VENDORS))
+    font_src = " ".join(("'self'", "data:", *_FONT_SRC_VENDORS))
 
     return "; ".join(
         [
             "default-src 'self'",
             f"img-src {img_src}",
-            "style-src 'self' 'unsafe-inline'",
+            f"style-src {style_src}",
             f"script-src {script_src}",
             # script-src-elem mirrors script-src but only applies to <script>
             # elements (not inline event handlers). Some browsers require it
             # explicitly when 'strict-dynamic' is in play.
             f"script-src-elem {script_src}",
-            "font-src 'self' data:",
+            f"font-src {font_src}",
             f"connect-src {connect_src}",
             f"frame-src {frame_src}",
             "frame-ancestors 'none'",

@@ -68,6 +68,11 @@ def test_homepage_emits_all_security_headers():
     assert "snap.licdn.com" in csp
     assert "bat.bing.com" in csp
     assert "analytics.tiktok.com" in csp
+    # Google Fonts (Inter + Sora display face on the home page) is loaded from
+    # fonts.googleapis.com (CSS) + fonts.gstatic.com (woff2). Both endpoints
+    # must be allow-listed or the typography silently falls back to system.
+    assert "fonts.googleapis.com" in csp
+    assert "fonts.gstatic.com" in csp
 
     assert response.headers["X-Frame-Options"] == "DENY"
     assert response.headers["X-Content-Type-Options"] == "nosniff"
