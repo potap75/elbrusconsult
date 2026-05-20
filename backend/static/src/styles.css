@@ -72,7 +72,10 @@
       0 18px 36px -18px rgba(15, 77, 140, 0.45);
   }
 
-  /* Decorative glow that follows the top edge of the card on hover. */
+  /* Decorative glow that follows the top edge of the card on hover.
+   * Tinted with the brand-mark cyan so the hover state echoes the icon
+   * tile's bottom-right corner. Kept at low alpha so the underlying
+   * heading copy stays the focal point. */
   .card-glass-glow {
     position: absolute;
     inset: -40% -10% auto -10%;
@@ -80,8 +83,8 @@
     pointer-events: none;
     background: radial-gradient(
       60% 80% at 50% 0%,
-      rgba(52, 145, 185, 0.35) 0%,
-      rgba(52, 145, 185, 0) 60%
+      rgba(0, 217, 255, 0.32) 0%,
+      rgba(0, 217, 255, 0) 60%
     );
     opacity: 0;
     transition: opacity 280ms ease;
@@ -91,17 +94,17 @@
     opacity: 1;
   }
 
-  /* Gradient fill for the icon tile. Color stops walk the summit ->
-   * glacier palette so it reads as part of the same brand family as
-   * the hero, just lighter / more "lit". The inner highlight is the
-   * inset shadow from theme.boxShadow["tile-glow"].
+  /* Gradient fill for the icon tile. Walks summit -> aurora so the top-
+   * left corner anchors in the institutional deep blue and the bottom-
+   * right corner pops with the brand mark's electric cyan. The inner
+   * highlight is the inset shadow from theme.boxShadow["tile-glow"].
    */
   .tile-gradient {
     background: linear-gradient(
       135deg,
       #0f4d8c 0%,
-      #2d6ab7 45%,
-      #3491b9 100%
+      #039ebd 55%,
+      #00d9ff 100%
     );
     position: relative;
   }

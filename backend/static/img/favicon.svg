@@ -1,5 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="#0f4d8c"/>
-  <path d="M8 50 L22 28 L32 38 L42 22 L56 50 Z" fill="#ffffff" opacity="0.95"/>
-  <circle cx="46" cy="18" r="4" fill="#fcd34d"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Elbrus Cloud">
+  <rect width="64" height="64" rx="12" fill="#04132b"/>
+  <!-- Outer twin peaks forming the "M" mark. -->
+  <polygon points="10,54 22,8 32,40 42,8 54,54" fill="#00D9FF"/>
+  <!-- Inner darker echoes inside each peak. -->
+  <polygon points="16,54 24,28 30,54" fill="#039EBD"/>
+  <polygon points="34,54 40,28 48,54" fill="#039EBD"/>
 </svg>

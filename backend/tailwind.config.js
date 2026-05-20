@@ -37,6 +37,25 @@ module.exports = {
           800: "#1d4d65",
           900: "#193e51",
         },
+        // Electric cyan pulled directly from the brand mark: the bright
+        // outer triangles of the "M" are aurora-500 (#00D9FF) and the
+        // darker inner echoes are aurora-600 (#039EBD). Use sparingly as
+        // an ACCENT on top of the institutional summit/glacier palette -
+        // a little of this color carries the futuristic energy; too much
+        // and the brand starts to look like a kids-toy box.
+        aurora: {
+          50:  "#e6fbff",
+          100: "#c2f4fe",
+          200: "#95ebfd",
+          300: "#5edcfc",
+          400: "#1fcbfa",
+          500: "#00d9ff",
+          600: "#039ebd",
+          700: "#0a7891",
+          800: "#0e5b6d",
+          900: "#0e3f4b",
+          950: "#052330",
+        },
       },
       fontFamily: {
         sans: [
