@@ -15,7 +15,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   {# Body face (Inter) + display face (Sora) for landing-page headlines. #}
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap">
-  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  {# Favicons: SVG first for modern browsers (sharpest at any DPR), with        #}
+  {# PNG fallbacks for older browsers and an apple-touch-icon for iOS home     #}
+  {# screen. The black backdrop matches the new brand mark on the OG card.     #}
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16.png' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
+  <meta name="theme-color" content="#000000">
 
   <link rel="alternate" type="application/rss+xml" title="{{ SITE_NAME }} blog" href="{% url 'blog-feed' %}">
 

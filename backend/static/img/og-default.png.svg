@@ -1,13 +1,14 @@
-<!-- Source SVG for the default OG image.
+<!-- Source SVG for the default Open Graph card.
 
-A real PNG should replace static/img/og-default.png (1200x630) for production.
-Open Graph crawlers prefer raster formats. -->
+Renders 1200x630 (the OG/Twitter recommended size). A real PNG should
+replace static/img/og-default.png for production, since OG crawlers
+prefer raster formats. -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#0a2f56"/>
       <stop offset="60%" stop-color="#04132b"/>
-      <stop offset="100%" stop-color="#000814"/>
+      <stop offset="100%" stop-color="#000000"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.85" cy="0.15" r="0.6">
       <stop offset="0%" stop-color="#00D9FF" stop-opacity="0.45"/>
@@ -21,10 +22,12 @@ Open Graph crawlers prefer raster formats. -->
   <path d="M0 520 L200 320 L380 420 L560 240 L760 380 L940 280 L1200 420 L1200 630 L0 630 Z" fill="#0f4d8c" opacity="0.55"/>
   <path d="M0 580 L240 400 L420 480 L620 320 L820 440 L1000 360 L1200 480 L1200 630 L0 630 Z" fill="#039EBD" opacity="0.35"/>
   <!-- Brand mark, scaled up from the favicon geometry. -->
-  <g transform="translate(60 60)">
-    <polygon points="20,108 44,16 64,80 84,16 108,108" fill="#00D9FF"/>
-    <polygon points="32,108 48,56 60,108" fill="#039EBD"/>
-    <polygon points="68,108 80,56 96,108" fill="#039EBD"/>
+  <g transform="translate(60 60) scale(2.0)">
+    <polygon points="10,54 22,8 32,40 42,8 54,54" fill="#00D9FF"/>
+    <polygon points="16,54 24,28 30,54" fill="#039EBD"/>
+    <polygon points="34,54 40,28 48,54" fill="#039EBD"/>
+    <path d="M14 38 Q9 38 9 33 Q9 27 15 26 Q17 19 25 19 Q31 17 33 23 Q39 21 44 26 Q50 27 50 33 Q50 38 44 38 Z"
+          fill="#FFFFFF" stroke="#00D9FF" stroke-width="1.4" stroke-linejoin="round"/>
   </g>
   <text x="60" y="360" font-family="Sora, Inter, system-ui, sans-serif" font-size="84" font-weight="800" fill="#ffffff">Elbrus Cloud</text>
   <text x="60" y="430" font-family="Inter, system-ui, sans-serif" font-size="36" font-weight="500" fill="#c4e2ef">Cloud Engineering &amp; Cybersecurity Excellence</text>
