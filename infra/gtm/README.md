@@ -20,7 +20,7 @@ What it ships:
 | Trigger | `CE — newsletter_subscribe_confirmed` | Custom Event trigger, fired from the newsletter confirm page. |
 | Trigger | `CE — booking_created` | Custom Event trigger, fired from the React scheduling island on first-time booking. |
 | Trigger | `CE — booking_rescheduled` | Custom Event trigger, fired from the React scheduling island on reschedule. |
-| Tag | `Google Tag — GA4 base` | Loads gtag and configures GA4 on every page. Inherits Consent Mode v2 state set by `_analytics_head.html`. |
+| Tag | `GA4 Configuration` | Loads gtag and configures GA4 on every page. Inherits Consent Mode v2 state set by `_analytics_head.html`. |
 | Tag | `GA4 — generate_lead — contact form` | GA4 Event `generate_lead`. Consent-gated on `analytics_storage`. |
 | Tag | `GA4 — sign_up — newsletter` | GA4 Event `sign_up` (method=newsletter). Consent-gated on `analytics_storage`. |
 | Tag | `GA4 — book_appointment — calendar` | GA4 Event `book_appointment`. Consent-gated on `analytics_storage`. |
@@ -38,7 +38,7 @@ All GA4 Event tags are gated by GTM's built-in consent feature on `analytics_sto
 6. Click **Confirm**.
 7. Open the **GA4 Measurement ID** variable in the Variables list and replace `G-XXXXXXXXXX` with your real Measurement ID from GA4 (Admin → Data Streams → Web → copy `G-...`).
 8. Click **Preview**, open elbruscloud.com in the connected Tag Assistant tab, and confirm:
-   - `Google Tag — GA4 base` fires on `Initialization`.
+   - `GA4 Configuration` fires on `Initialization`.
    - The four `GA4 — *` event tags appear under their custom events (you can fire them manually from the contact form, newsletter confirm, and booking flows).
 9. **Submit** the workspace as a new container version. Name it `v1 — initial import (5 tags)`.
 10. **Publish**.
