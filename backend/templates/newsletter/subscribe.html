@@ -1,32 +1,46 @@
 {% extends "base.html" %}
+{% load icons %}
 
 {% block content %}
-  <section class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-20">
-    <p class="text-sm font-semibold uppercase tracking-wider text-summit-700">Newsletter</p>
-    <h1 class="mt-2 text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">
-      Monthly insights, no fluff.
-    </h1>
-    <p class="mt-4 text-slate-600">
-      One short, focused email per month: practical guidance on cloud security,
-      lessons from real engagements, and the occasional war story.
-    </p>
+  {% include "partials/_page_hero.html" with hero_eyebrow="Newsletter" hero_heading="Monthly insights, no fluff." hero_lead="One short, focused email per month: practical guidance on cloud security, lessons from real engagements, and the occasional war story." %}
 
-    <form method="post" action="" class="mt-8 flex flex-col sm:flex-row gap-3 bg-white border border-slate-200 rounded-lg p-6 shadow-sm" novalidate>
-      {% csrf_token %}
+  <section class="relative isolate overflow-hidden bg-slate-50">
+    <div class="topographic-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
 
-      <label class="sr-only" for="{{ form.email.id_for_label }}">Email address</label>
-      {{ form.email }}
+    <div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+      <form method="post" action="" novalidate
+            class="card-glass relative flex flex-col gap-5 p-6 sm:p-8"
+            data-reveal="card">
+        {% csrf_token %}
 
-      <div class="hidden" aria-hidden="true">{{ form.website }}</div>
+        <div class="flex items-center gap-3">
+          {% include "partials/_service_icon_tile.html" with icon="newspaper" %}
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-aurora-700">Subscribe</p>
+            <p class="font-display text-lg font-semibold tracking-tight text-slate-900">Get the next issue.</p>
+          </div>
+        </div>
 
-      <button type="submit"
-              class="inline-flex items-center justify-center rounded-md bg-summit-600 px-5 py-3 text-white font-semibold hover:bg-summit-700">
-        Subscribe
-      </button>
-    </form>
+        <label class="sr-only" for="{{ form.email.id_for_label }}">Email address</label>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <div class="flex-1">
+            {{ form.email }}
+            {% if form.email.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.email.errors|join:", " }}</p>{% endif %}
+          </div>
+          <button type="submit"
+                  class="inline-flex items-center justify-center gap-2 rounded-md bg-gradient-to-br from-summit-700 via-summit-600 to-aurora-700 px-5 py-3 text-white font-semibold shadow-sm transition hover:shadow-[0_8px_24px_-12px_rgba(0,217,255,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
+            Subscribe
+            {% heroicon "paper-airplane" class="h-4 w-4" %}
+          </button>
+        </div>
 
-    {% if form.email.errors %}<p class="mt-2 text-sm text-rose-600">{{ form.email.errors|join:", " }}</p>{% endif %}
+        <div class="hidden" aria-hidden="true">{{ form.website }}</div>
 
-    <p class="mt-4 text-xs text-slate-500">We use double opt-in. No spam, ever. Unsubscribe in one click.</p>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          We use double opt-in. No spam, ever. Unsubscribe in one click from any email.
+        </p>
+        <span class="card-glass-glow" aria-hidden="true"></span>
+      </form>
+    </div>
   </section>
 {% endblock %}

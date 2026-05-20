@@ -1,55 +1,94 @@
 {% extends "base.html" %}
+{% load icons %}
 
 {% block content %}
-  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-20">
-    <p class="text-sm font-semibold uppercase tracking-wider text-summit-700">About</p>
-    <h1 class="mt-2 text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">
-      Clear, concise solutions to hard security problems.
-    </h1>
+  {% include "partials/_page_hero.html" with hero_eyebrow="About" hero_heading="Clear, concise solutions to hard security problems." hero_lead="A boutique team of senior cloud and cybersecurity consultants. We evaluate your real risk and design controls that fit your environment — not someone else's playbook." %}
 
-    <div class="prose prose-slate mt-8 max-w-none">
-      <p>
-        {{ SITE_NAME }} is a boutique firm of cloud and cybersecurity consultants. Our team
-        evaluates your risk of a breach and designs optimal controls tailored to your needs.
-      </p>
+  <section class="relative isolate overflow-hidden bg-slate-50">
+    <div class="topographic-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
 
-      <h2>Two decades of focused expertise</h2>
-      <p>
-        Our consultants have spent careers - in many cases more than twenty years - working
-        exclusively in information security. Architects, engineers, analysts, and developers,
-        all with hands-on experience securing applications, networks, operations, and data.
-      </p>
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-20 lg:py-24">
+      <div class="grid gap-6 sm:grid-cols-3">
+        <article class="card-glass relative flex flex-col gap-3 p-6"
+                 data-reveal="card" data-reveal-stagger="0">
+          {% include "partials/_service_icon_tile.html" with icon="user-group" %}
+          <h2 class="font-display text-lg font-semibold tracking-tight text-slate-900">Senior consultants only</h2>
+          <p class="text-sm leading-relaxed text-slate-600">
+            Twenty-plus years per consultant. Architects, engineers, analysts, and developers who
+            have built and defended systems at scale.
+          </p>
+          <span class="card-glass-glow" aria-hidden="true"></span>
+        </article>
 
-      <h2>How we work</h2>
-      <ul>
-        <li>Assess: We start with a clear-eyed look at your current state.</li>
-        <li>Design: We translate findings into prioritized, realistic remediation plans.</li>
-        <li>Implement: We work alongside your team - not in a vacuum.</li>
-        <li>Transfer: We leave you with documented operating procedures and trained staff.</li>
-      </ul>
+        <article class="card-glass relative flex flex-col gap-3 p-6"
+                 data-reveal="card" data-reveal-stagger="1">
+          {% include "partials/_service_icon_tile.html" with icon="adjustments-horizontal" %}
+          <h2 class="font-display text-lg font-semibold tracking-tight text-slate-900">Framework rigor</h2>
+          <p class="text-sm leading-relaxed text-slate-600">
+            We translate NIST, CIS, and ISO 27001 into concrete controls and prioritized
+            roadmaps tied to your business outcomes.
+          </p>
+          <span class="card-glass-glow" aria-hidden="true"></span>
+        </article>
 
-      <h2>Industries we serve</h2>
-      <p>
-        Financial services, healthcare, pharmaceuticals, manufacturing, utilities, and
-        communications. Our expertise spans ransomware, phishing, DDoS, cloud
-        misconfigurations, malware, identity and access management, and more.
-      </p>
+        <article class="card-glass relative flex flex-col gap-3 p-6"
+                 data-reveal="card" data-reveal-stagger="2">
+          {% include "partials/_service_icon_tile.html" with icon="academic-cap" %}
+          <h2 class="font-display text-lg font-semibold tracking-tight text-slate-900">Knowledge transfer</h2>
+          <p class="text-sm leading-relaxed text-slate-600">
+            Every engagement leaves your team with documented procedures, runbooks, and the
+            confidence to operate them.
+          </p>
+          <span class="card-glass-glow" aria-hidden="true"></span>
+        </article>
+      </div>
 
-      <blockquote>
-        Cybersecurity protects digital systems from attacks while keeping business processes
-        running. Done right, it is not a tax on the business - it is an enabler.
-      </blockquote>
-    </div>
+      <article class="prose prose-slate mt-16 max-w-3xl" data-reveal="card">
+        <p class="lead">
+          {{ SITE_NAME }} is a boutique firm of cloud and cybersecurity consultants. Our team
+          evaluates your risk of a breach and designs optimal controls tailored to your needs.
+        </p>
 
-    <div class="mt-12 flex flex-wrap gap-4">
-      <a href="{% url 'services-list' %}"
-         class="inline-flex items-center rounded-md bg-summit-600 px-4 py-2 text-white font-medium hover:bg-summit-700">
-        See our services
-      </a>
-      <a href="{% url 'contact' %}"
-         class="inline-flex items-center rounded-md border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-100">
-        Get in touch
-      </a>
+        <h2>Two decades of focused expertise</h2>
+        <p>
+          Our consultants have spent careers &mdash; in many cases more than twenty years &mdash;
+          working exclusively in information security. Architects, engineers, analysts, and
+          developers, all with hands-on experience securing applications, networks,
+          operations, and data.
+        </p>
+
+        <h2>How we work</h2>
+        <ul>
+          <li><strong>Assess.</strong> We start with a clear-eyed look at your current state.</li>
+          <li><strong>Design.</strong> We translate findings into prioritized, realistic remediation plans.</li>
+          <li><strong>Implement.</strong> We work alongside your team &mdash; not in a vacuum.</li>
+          <li><strong>Transfer.</strong> We leave you with documented operating procedures and trained staff.</li>
+        </ul>
+
+        <h2>Industries we serve</h2>
+        <p>
+          Financial services, healthcare, pharmaceuticals, manufacturing, utilities, and
+          communications. Our expertise spans ransomware, phishing, DDoS, cloud
+          misconfigurations, malware, identity and access management, and more.
+        </p>
+
+        <blockquote>
+          Cybersecurity protects digital systems from attacks while keeping business processes
+          running. Done right, it&rsquo;s not a tax on the business &mdash; it&rsquo;s an enabler.
+        </blockquote>
+      </article>
+
+      <div class="mt-12 flex flex-wrap gap-4" data-reveal="card">
+        <a href="{% url 'services-list' %}"
+           class="inline-flex items-center gap-2 rounded-md bg-gradient-to-br from-summit-700 via-summit-600 to-aurora-700 px-4 py-2 text-white font-semibold shadow-sm transition hover:shadow-[0_8px_24px_-12px_rgba(0,217,255,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
+          See our services
+          {% heroicon "arrow-right" class="h-4 w-4" %}
+        </a>
+        <a href="{% url 'contact' %}"
+           class="inline-flex items-center rounded-md border border-slate-300 bg-white/60 px-4 py-2 text-slate-700 font-medium hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-summit-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
+          Get in touch
+        </a>
+      </div>
     </div>
   </section>
 {% endblock %}

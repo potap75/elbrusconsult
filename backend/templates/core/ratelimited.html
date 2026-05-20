@@ -1,20 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="mx-auto max-w-2xl px-4 py-24 text-center">
-  <p class="text-sm font-semibold uppercase tracking-wider text-slate-500">429</p>
-  <h1 class="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-    Too many requests
-  </h1>
-  <p class="mt-4 text-lg text-slate-600">
-    You are sending requests faster than we allow. Please wait a few minutes
-    and try again. If you believe this is an error, you can
-    <a href="{% url 'contact' %}" class="font-medium text-sky-700 underline">contact us</a>.
-  </p>
-  <div class="mt-8">
-    <a href="/" class="inline-flex items-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
-      Back to home
-    </a>
-  </div>
-</section>
+  {% url 'home' as home_url %}
+  {% url 'contact' as contact_url %}
+  {% include "partials/_status_card.html" with status_tone="warning" status_icon="exclamation-triangle" status_eyebrow="429 — slow down" status_heading="Too many requests" status_lead="You're sending requests faster than we allow. Please wait a few minutes and try again. If you believe this is an error, let us know." status_primary_cta_label="Back to home" status_primary_cta_url=home_url status_secondary_cta_label="Contact us" status_secondary_cta_url=contact_url %}
 {% endblock %}

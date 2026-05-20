@@ -1,0 +1,88 @@
+{% comment %}
+Site-wide page hero with the dark summit gradient + decorative topographic
+SVG that the home page uses. Renders only when at least one of the slots
+(`hero_eyebrow`, `hero_heading`, `hero_lead`) is provided. Designed to
+visually unify every non-home page with the home hero's vocabulary.
+
+Context variables this partial reads (all optional, but at least one should
+be set or the section becomes an empty dark band):
+
+- ``hero_eyebrow``           — small all-caps label above the H1.
+- ``hero_heading``           — string for the H1.
+- ``hero_heading_html``      — when truthy, ``hero_heading`` is rendered raw
+                              via ``|safe`` so the caller can embed an
+                              aurora gradient span (or other inline
+                              markup) inside it. When falsy (default) the
+                              heading is escaped as plain text.
+- ``hero_lead``              — short lead paragraph below the H1.
+- ``hero_size``              — ``"sm"`` (compact, for status pages),
+                              ``"md"`` (default), or ``"lg"`` (matches home).
+- ``hero_align``             — ``"left"`` (default) or ``"center"``.
+- ``hero_primary_cta_label`` / ``hero_primary_cta_url``
+                              optional white/solid primary CTA button.
+- ``hero_secondary_cta_label`` / ``hero_secondary_cta_url``
+                              optional outlined secondary CTA button.
+
+The dark band leaves a soft bleed into the next section so the slate-50
+content area underneath feels intentional, matching ``home.html``.
+{% endcomment %}
+
+<section class="relative isolate overflow-hidden bg-gradient-to-br from-summit-700 via-summit-800 to-slate-900 text-white">
+  <div class="absolute inset-0 -z-10 opacity-20 [mask-image:radial-gradient(white,transparent_70%)]"
+       aria-hidden="true">
+    <svg viewBox="0 0 800 600" class="h-full w-full" preserveAspectRatio="xMidYMid slice">
+      <path d="M0 480 L150 280 L260 360 L380 180 L500 320 L620 220 L800 360 L800 600 L0 600 Z"
+            fill="currentColor" class="text-summit-500"/>
+    </svg>
+  </div>
+  <div class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-slate-50/15"
+       aria-hidden="true"></div>
+
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8
+              {% if hero_size == 'sm' %}py-16 lg:py-20
+              {% elif hero_size == 'lg' %}py-24 lg:py-32
+              {% else %}py-20 lg:py-24{% endif %}
+              {% if hero_align == 'center' %}text-center{% endif %}">
+
+    {% if hero_eyebrow %}
+      <p class="text-aurora-300 text-sm font-semibold uppercase tracking-[0.2em]"
+         data-reveal="card">{{ hero_eyebrow }}</p>
+    {% endif %}
+
+    {% if hero_heading %}
+      <h1 class="mt-3 font-display
+                 {% if hero_size == 'sm' %}text-3xl sm:text-4xl
+                 {% elif hero_size == 'lg' %}text-4xl sm:text-5xl lg:text-6xl
+                 {% else %}text-4xl sm:text-5xl{% endif %}
+                 font-bold tracking-tight"
+          data-reveal="card" data-reveal-stagger="1">
+        {% if hero_heading_html %}{{ hero_heading|safe }}{% else %}{{ hero_heading }}{% endif %}
+      </h1>
+    {% endif %}
+
+    {% if hero_lead %}
+      <p class="mt-6 {% if hero_align != 'center' %}max-w-2xl{% else %}mx-auto max-w-2xl{% endif %}
+                text-lg text-summit-100"
+         data-reveal="card" data-reveal-stagger="2">{{ hero_lead }}</p>
+    {% endif %}
+
+    {% if hero_primary_cta_label or hero_secondary_cta_label %}
+      <div class="mt-10 flex flex-wrap gap-4
+                  {% if hero_align == 'center' %}justify-center{% endif %}"
+           data-reveal="card" data-reveal-stagger="3">
+        {% if hero_primary_cta_label and hero_primary_cta_url %}
+          <a href="{{ hero_primary_cta_url }}"
+             class="inline-flex items-center rounded-md bg-white px-5 py-3 text-summit-800 font-semibold shadow hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-300 focus-visible:ring-offset-2 focus-visible:ring-offset-summit-800">
+            {{ hero_primary_cta_label }}
+          </a>
+        {% endif %}
+        {% if hero_secondary_cta_label and hero_secondary_cta_url %}
+          <a href="{{ hero_secondary_cta_url }}"
+             class="inline-flex items-center rounded-md border border-white/30 px-5 py-3 font-semibold hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-300 focus-visible:ring-offset-2 focus-visible:ring-offset-summit-800">
+            {{ hero_secondary_cta_label }}
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>

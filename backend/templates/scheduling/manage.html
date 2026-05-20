@@ -1,89 +1,106 @@
 {% extends "base.html" %}
+{% load icons %}
 
 {% block content %}
-  <section class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-20">
-    <p class="text-sm font-semibold uppercase tracking-wider text-summit-700">Your booking</p>
-    <h1 class="mt-2 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
-      {% if booking.status == 'cancelled' %}
-        Booking cancelled
-      {% else %}
-        Manage your booking
-      {% endif %}
-    </h1>
+  {% if booking.status == 'cancelled' %}
+    {% include "partials/_page_hero.html" with hero_eyebrow="Your booking" hero_heading="Booking cancelled" hero_lead="This appointment has been cancelled. You can book a new time whenever you're ready." %}
+  {% else %}
+    {% include "partials/_page_hero.html" with hero_eyebrow="Your booking" hero_heading="Manage your booking" hero_lead="Reschedule or cancel below. Changes are reflected immediately and we'll email a confirmation." %}
+  {% endif %}
 
-    <div class="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-      <dl class="grid grid-cols-1 sm:grid-cols-3 gap-y-3 gap-x-6 text-sm">
-        <dt class="text-slate-500">Status</dt>
-        <dd class="sm:col-span-2 font-medium {% if booking.status == 'cancelled' %}text-rose-700{% else %}text-emerald-700{% endif %}">
-          {{ booking.get_status_display }}
-        </dd>
+  <section class="relative isolate overflow-hidden bg-slate-50">
+    <div class="topographic-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
 
-        <dt class="text-slate-500">Type</dt>
-        <dd class="sm:col-span-2">
-          {{ booking.appointment_type.name }}
-          <span class="text-slate-500">({{ booking.appointment_type.duration_minutes }} min)</span>
-        </dd>
+    <div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+      <div class="card-glass relative p-6 sm:p-8" data-reveal="card">
+        <div class="flex items-center gap-3">
+          <span class="tile-gradient inline-flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-tile-glow ring-1 ring-white/15">
+            {% heroicon "calendar-days" class="h-6 w-6" %}
+          </span>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-aurora-700">Appointment</p>
+            <p class="font-display text-lg font-semibold tracking-tight text-slate-900">
+              {{ booking.appointment_type.name }}
+              <span class="text-sm font-normal text-slate-500">({{ booking.appointment_type.duration_minutes }} min)</span>
+            </p>
+          </div>
+        </div>
 
-        <dt class="text-slate-500">When</dt>
-        <dd class="sm:col-span-2">
-          <time datetime="{{ booking.start_at|date:'c' }}">
-            {{ booking.start_at|date:"l, F j, Y" }} at {{ booking.start_at|date:"H:i" }} UTC
-          </time>
-          {% if booking.customer_timezone %}
-            <span class="text-slate-500">&middot; you booked in {{ booking.customer_timezone }}</span>
+        <dl class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-y-3 gap-x-6 text-sm">
+          <dt class="text-slate-500">Status</dt>
+          <dd class="sm:col-span-2 font-semibold
+                     {% if booking.status == 'cancelled' %}text-rose-700{% else %}text-emerald-700{% endif %}">
+            {{ booking.get_status_display }}
+          </dd>
+
+          <dt class="text-slate-500">When</dt>
+          <dd class="sm:col-span-2 text-slate-800">
+            <time datetime="{{ booking.start_at|date:'c' }}">
+              {{ booking.start_at|date:"l, F j, Y" }} at {{ booking.start_at|date:"H:i" }} UTC
+            </time>
+            {% if booking.customer_timezone %}
+              <span class="block text-slate-500">you booked in {{ booking.customer_timezone }}</span>
+            {% endif %}
+          </dd>
+
+          {% if booking.appointment_type.location_instructions %}
+            <dt class="text-slate-500">Where</dt>
+            <dd class="sm:col-span-2 text-slate-800">{{ booking.appointment_type.location_instructions }}</dd>
           {% endif %}
-        </dd>
 
-        {% if booking.appointment_type.location_instructions %}
-          <dt class="text-slate-500">Where</dt>
-          <dd class="sm:col-span-2">{{ booking.appointment_type.location_instructions }}</dd>
-        {% endif %}
+          <dt class="text-slate-500">Name</dt>
+          <dd class="sm:col-span-2 text-slate-800">{{ booking.name }}</dd>
 
-        <dt class="text-slate-500">Name</dt>
-        <dd class="sm:col-span-2">{{ booking.name }}</dd>
+          <dt class="text-slate-500">Email</dt>
+          <dd class="sm:col-span-2 text-slate-800">{{ booking.email }}</dd>
 
-        <dt class="text-slate-500">Email</dt>
-        <dd class="sm:col-span-2">{{ booking.email }}</dd>
+          {% if booking.company %}
+            <dt class="text-slate-500">Company</dt>
+            <dd class="sm:col-span-2 text-slate-800">{{ booking.company }}</dd>
+          {% endif %}
 
-        {% if booking.company %}
-          <dt class="text-slate-500">Company</dt>
-          <dd class="sm:col-span-2">{{ booking.company }}</dd>
-        {% endif %}
+          {% if booking.notes %}
+            <dt class="text-slate-500">Notes</dt>
+            <dd class="sm:col-span-2 whitespace-pre-line text-slate-800">{{ booking.notes }}</dd>
+          {% endif %}
+        </dl>
+        <span class="card-glass-glow" aria-hidden="true"></span>
+      </div>
 
-        {% if booking.notes %}
-          <dt class="text-slate-500">Notes</dt>
-          <dd class="sm:col-span-2 whitespace-pre-line">{{ booking.notes }}</dd>
-        {% endif %}
-      </dl>
-    </div>
-
-    {% if can_modify %}
-      <div class="mt-8 flex flex-col sm:flex-row gap-3">
-        <a href="{{ booking.get_reschedule_url }}"
-           class="inline-flex items-center justify-center rounded-md bg-summit-600 px-5 py-3 text-white font-semibold hover:bg-summit-700">
-          Reschedule
-        </a>
+      {% if can_modify %}
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row" data-reveal="card">
+          <a href="{{ booking.get_reschedule_url }}"
+             class="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-gradient-to-br from-summit-700 via-summit-600 to-aurora-700 px-5 py-3 text-white font-semibold shadow-sm transition hover:shadow-[0_8px_24px_-12px_rgba(0,217,255,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
+            Reschedule
+            {% heroicon "arrow-right" class="h-4 w-4" %}
+          </a>
+        </div>
         <form method="post" action="{% url 'scheduling-manage-cancel' token=booking.manage_token %}"
               onsubmit="return confirm('Cancel this booking? This cannot be undone.');"
-              class="flex flex-col sm:flex-row gap-3 sm:items-center">
+              class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center"
+              data-reveal="card" data-reveal-stagger="1">
           {% csrf_token %}
           <input type="text" name="reason" maxlength="200" placeholder="Reason (optional)"
-                 class="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-summit-500 focus:border-summit-500">
+                 class="form-input flex-1">
           <button type="submit"
-                  class="inline-flex items-center justify-center rounded-md border border-rose-300 bg-rose-50 px-5 py-3 text-rose-800 font-semibold hover:bg-rose-100">
+                  class="inline-flex items-center justify-center rounded-md border border-rose-300 bg-rose-50 px-5 py-3 text-rose-800 font-semibold hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
             Cancel booking
           </button>
         </form>
-      </div>
-    {% elif booking.status == 'cancelled' %}
-      <div class="mt-8 rounded-md border border-slate-200 bg-slate-50 p-4 text-slate-700">
-        This booking has been cancelled. To book a new time,
-        <a href="{% url 'schedule' %}" class="text-summit-700 underline">visit the booking page</a>.
-      </div>
-    {% else %}
-      <div class="mt-8 rounded-md border border-slate-200 bg-slate-50 p-4 text-slate-700">
-        This booking is in the past and can no longer be changed.
-      </div>
-    {% endif %}
+      {% elif booking.status == 'cancelled' %}
+        <div class="card-glass relative mt-8 p-6 text-slate-700" data-reveal="card">
+          <p>
+            This booking has been cancelled. To book a new time,
+            <a href="{% url 'schedule' %}" class="font-semibold text-summit-700 hover:text-aurora-700">visit the booking page</a>.
+          </p>
+          <span class="card-glass-glow" aria-hidden="true"></span>
+        </div>
+      {% else %}
+        <div class="card-glass relative mt-8 p-6 text-slate-700" data-reveal="card">
+          <p>This booking is in the past and can no longer be changed.</p>
+          <span class="card-glass-glow" aria-hidden="true"></span>
+        </div>
+      {% endif %}
+    </div>
   </section>
 {% endblock %}

@@ -1,71 +1,88 @@
 {% extends "base.html" %}
-{% load seo_tags %}
+{% load icons seo_tags %}
 
 {% block extra_head %}
   {% json_ld local_business_schema %}
 {% endblock %}
 
 {% block content %}
-  <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-20">
-    <p class="text-sm font-semibold uppercase tracking-wider text-summit-700">Contact</p>
-    <h1 class="mt-2 text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">Let's work together.</h1>
-    <p class="mt-4 text-slate-600 max-w-2xl">
-      Tell us a bit about your environment and goals. We will respond with next steps,
-      typically within one business day.
-    </p>
+  {% include "partials/_page_hero.html" with hero_eyebrow="Contact" hero_heading="Let's work together." hero_lead="Tell us a bit about your environment and goals. We'll respond with concrete next steps, typically within one business day." %}
 
-    {% if messages %}
-      <div class="mt-8 space-y-2">
-        {% for message in messages %}
-          <div class="rounded-md border border-summit-300 bg-summit-50 px-4 py-3 text-summit-900">{{ message }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
+  <section class="relative isolate overflow-hidden bg-slate-50">
+    <div class="topographic-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
 
-    <form method="post" action="" class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white border border-slate-200 rounded-lg p-6 shadow-sm" novalidate>
-      {% csrf_token %}
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+      {% if messages %}
+        <div class="mb-8 space-y-2" data-reveal="card">
+          {% for message in messages %}
+            <div class="card-glass relative flex items-start gap-3 p-4 text-summit-900">
+              <span class="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-aurora-400 to-aurora-700 text-white shadow-tile-glow">
+                {% heroicon "check" class="h-4 w-4" %}
+              </span>
+              <p class="text-sm leading-relaxed">{{ message }}</p>
+              <span class="card-glass-glow" aria-hidden="true"></span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
 
-      <div class="md:col-span-1">
-        <label class="block text-sm font-medium text-slate-700" for="{{ form.name.id_for_label }}">Name</label>
-        {{ form.name }}
-        {% if form.name.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.name.errors|join:", " }}</p>{% endif %}
-      </div>
+      <form method="post" action="" novalidate
+            class="card-glass relative grid grid-cols-1 gap-6 p-6 sm:p-8 md:grid-cols-2"
+            data-reveal="card">
+        {% csrf_token %}
 
-      <div class="md:col-span-1">
-        <label class="block text-sm font-medium text-slate-700" for="{{ form.email.id_for_label }}">Email</label>
-        {{ form.email }}
-        {% if form.email.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.email.errors|join:", " }}</p>{% endif %}
-      </div>
+        <div class="md:col-span-2 flex items-center gap-3">
+          {% include "partials/_service_icon_tile.html" with icon="envelope" %}
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-aurora-700">Send a message</p>
+            <p class="font-display text-lg font-semibold tracking-tight text-slate-900">We read every note personally.</p>
+          </div>
+        </div>
 
-      <div class="md:col-span-1">
-        <label class="block text-sm font-medium text-slate-700" for="{{ form.company.id_for_label }}">Company</label>
-        {{ form.company }}
-      </div>
+        <div class="md:col-span-1">
+          <label class="block text-sm font-medium text-slate-700" for="{{ form.name.id_for_label }}">Name</label>
+          {{ form.name }}
+          {% if form.name.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.name.errors|join:", " }}</p>{% endif %}
+        </div>
 
-      <div class="md:col-span-1">
-        <label class="block text-sm font-medium text-slate-700" for="{{ form.subject.id_for_label }}">Subject</label>
-        {{ form.subject }}
-      </div>
+        <div class="md:col-span-1">
+          <label class="block text-sm font-medium text-slate-700" for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.email.errors|join:", " }}</p>{% endif %}
+        </div>
 
-      <div class="md:col-span-2">
-        <label class="block text-sm font-medium text-slate-700" for="{{ form.message.id_for_label }}">Message</label>
-        {{ form.message }}
-        {% if form.message.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.message.errors|join:", " }}</p>{% endif %}
-      </div>
+        <div class="md:col-span-1">
+          <label class="block text-sm font-medium text-slate-700" for="{{ form.company.id_for_label }}">Company</label>
+          {{ form.company }}
+        </div>
 
-      {# Honeypot - hidden from real users #}
-      <div class="hidden" aria-hidden="true">
-        {{ form.website.label_tag }}
-        {{ form.website }}
-      </div>
+        <div class="md:col-span-1">
+          <label class="block text-sm font-medium text-slate-700" for="{{ form.subject.id_for_label }}">Subject</label>
+          {{ form.subject }}
+        </div>
 
-      <div class="md:col-span-2 flex items-center justify-between">
-        <p class="text-xs text-slate-500">We never share your data.</p>
-        <button type="submit"
-                class="inline-flex items-center rounded-md bg-summit-600 px-5 py-3 text-white font-semibold hover:bg-summit-700">
-          Send message
-        </button>
-      </div>
-    </form>
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-slate-700" for="{{ form.message.id_for_label }}">Message</label>
+          {{ form.message }}
+          {% if form.message.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.message.errors|join:", " }}</p>{% endif %}
+        </div>
+
+        {# Honeypot - hidden from real users. #}
+        <div class="hidden" aria-hidden="true">
+          {{ form.website.label_tag }}
+          {{ form.website }}
+        </div>
+
+        <div class="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
+          <p class="text-xs text-slate-500">We never share your data.</p>
+          <button type="submit"
+                  class="inline-flex items-center gap-2 rounded-md bg-gradient-to-br from-summit-700 via-summit-600 to-aurora-700 px-5 py-3 text-white font-semibold shadow-sm transition hover:shadow-[0_8px_24px_-12px_rgba(0,217,255,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
+            Send message
+            {% heroicon "paper-airplane" class="h-4 w-4" %}
+          </button>
+        </div>
+        <span class="card-glass-glow" aria-hidden="true"></span>
+      </form>
+    </div>
   </section>
 {% endblock %}

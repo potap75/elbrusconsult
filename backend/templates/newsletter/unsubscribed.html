@@ -1,14 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-24 text-center">
-    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">You've been unsubscribed.</h1>
-    <p class="mt-4 text-slate-600">
-      {{ subscriber.email }} will no longer receive newsletters from us. Sorry to see you go.
-    </p>
-    <a href="{% url 'home' %}"
-       class="mt-8 inline-flex items-center rounded-md border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-100">
-      Back home
-    </a>
-  </section>
+  {% url 'home' as home_url %}
+  {% url 'newsletter-subscribe' as resubscribe_url %}
+  {% include "partials/_status_card.html" with status_tone="farewell" status_icon="hand-raised" status_eyebrow="Unsubscribed" status_heading="You've been unsubscribed." status_lead=subscriber.email|add:" will no longer receive newsletters from us. Sorry to see you go — you're welcome back any time." status_primary_cta_label="Back to home" status_primary_cta_url=home_url status_secondary_cta_label="Resubscribe" status_secondary_cta_url=resubscribe_url %}
 {% endblock %}

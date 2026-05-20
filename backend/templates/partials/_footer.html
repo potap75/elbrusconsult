@@ -1,39 +1,51 @@
-<footer class="bg-slate-900 text-slate-300 mt-16">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+<footer class="relative isolate mt-16 overflow-hidden bg-slate-900 text-slate-300">
+  {# Subtle aurora hairline above the footer to echo the brand mark. #}
+  <div aria-hidden="true"
+       class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-aurora-500/60 to-transparent"></div>
+  {# Soft topographic glow behind the columns. #}
+  <div aria-hidden="true"
+       class="pointer-events-none absolute inset-0 -z-10 opacity-30 [mask-image:radial-gradient(ellipse_at_top,white,transparent_70%)]">
+    <div class="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-aurora-700/15 via-summit-800/10 to-transparent"></div>
+  </div>
+
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 md:grid-cols-3 gap-10">
     <div>
-      <p class="text-white text-lg font-semibold">{{ SITE_NAME }}</p>
-      <p class="mt-2 text-sm leading-relaxed">{{ SITE_TAGLINE }}</p>
+      <p class="font-display text-white text-xl font-semibold tracking-tight">{{ SITE_NAME }}</p>
+      <p class="mt-3 text-sm leading-relaxed">{{ SITE_TAGLINE }}</p>
       <p class="mt-4 text-sm">
-        <a class="hover:text-white" href="mailto:{{ INFO_EMAIL }}">{{ INFO_EMAIL }}</a>
+        <a class="inline-flex items-center gap-1.5 hover:text-white transition-colors"
+           href="mailto:{{ INFO_EMAIL }}">{{ INFO_EMAIL }}</a>
       </p>
     </div>
 
     <nav aria-label="Footer">
-      <p class="text-white text-sm font-semibold uppercase tracking-wide">Site</p>
-      <ul class="mt-3 space-y-2 text-sm">
-        <li><a class="hover:text-white" href="{% url 'home' %}">Home</a></li>
-        <li><a class="hover:text-white" href="{% url 'services-list' %}">Services</a></li>
-        <li><a class="hover:text-white" href="{% url 'about' %}">About</a></li>
-        <li><a class="hover:text-white" href="{% url 'blog-list' %}">Blog</a></li>
-        <li><a class="hover:text-white" href="{% url 'contact' %}">Contact</a></li>
+      <p class="text-white text-xs font-semibold uppercase tracking-[0.2em]">Site</p>
+      <ul class="mt-4 space-y-2 text-sm">
+        <li><a class="transition-colors hover:text-white" href="{% url 'home' %}">Home</a></li>
+        <li><a class="transition-colors hover:text-white" href="{% url 'services-list' %}">Services</a></li>
+        <li><a class="transition-colors hover:text-white" href="{% url 'about' %}">About</a></li>
+        <li><a class="transition-colors hover:text-white" href="{% url 'blog-list' %}">Blog</a></li>
+        <li><a class="transition-colors hover:text-white" href="{% url 'contact' %}">Contact</a></li>
       </ul>
     </nav>
 
     <div>
-      <p class="text-white text-sm font-semibold uppercase tracking-wide">Stay in touch</p>
-      <p class="mt-3 text-sm">Monthly insights on cloud architecture and cybersecurity.</p>
-      <a class="mt-4 inline-flex items-center rounded-md bg-summit-600 px-3 py-2 text-white text-sm font-medium hover:bg-summit-700"
-         href="{% url 'newsletter-subscribe' %}">Subscribe to the newsletter</a>
+      <p class="text-white text-xs font-semibold uppercase tracking-[0.2em]">Stay in touch</p>
+      <p class="mt-4 text-sm leading-relaxed">Monthly insights on cloud architecture and cybersecurity.</p>
+      <a class="mt-5 inline-flex items-center gap-2 rounded-md bg-gradient-to-br from-summit-700 via-summit-600 to-aurora-700 px-4 py-2 text-white text-sm font-semibold shadow-sm transition hover:shadow-[0_8px_24px_-12px_rgba(0,217,255,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+         href="{% url 'newsletter-subscribe' %}">
+        Subscribe to the newsletter
+      </a>
     </div>
   </div>
 
-  <div class="border-t border-slate-800">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 text-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+  <div class="border-t border-white/5">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 text-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-slate-400">
       <p>&copy; {% now "Y" %} {{ SITE_NAME }}. All rights reserved.</p>
-      <p>
-        <a class="hover:text-white" href="{% url 'sitemap' %}">Sitemap</a>
-        <span aria-hidden="true" class="mx-2">&middot;</span>
-        <a class="hover:text-white" href="{% url 'blog-feed' %}">RSS</a>
+      <p class="flex items-center gap-2">
+        <a class="transition-colors hover:text-white" href="{% url 'sitemap' %}">Sitemap</a>
+        <span aria-hidden="true" class="text-slate-600">&middot;</span>
+        <a class="transition-colors hover:text-white" href="{% url 'blog-feed' %}">RSS</a>
       </p>
     </div>
   </div>

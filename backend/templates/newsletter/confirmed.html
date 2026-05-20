@@ -1,15 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-24 text-center">
-    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">You're in.</h1>
-    <p class="mt-4 text-slate-600">
-      Thanks, {{ subscriber.email }} - your subscription is confirmed.
-      The first issue will land in your inbox soon.
-    </p>
-    <a href="{% url 'blog-list' %}"
-       class="mt-8 inline-flex items-center rounded-md bg-summit-600 px-4 py-2 text-white font-medium hover:bg-summit-700">
-      Read the blog
-    </a>
-  </section>
+  {% url 'blog-list' as blog_url %}
+  {% url 'home' as home_url %}
+  {% include "partials/_status_card.html" with status_icon="check-circle" status_eyebrow="Subscription confirmed" status_heading="You're in." status_lead="Thanks, "|add:subscriber.email|add:" — your subscription is confirmed. The first issue will land in your inbox soon." status_primary_cta_label="Read the blog" status_primary_cta_url=blog_url status_secondary_cta_label="Back to home" status_secondary_cta_url=home_url %}
 {% endblock %}

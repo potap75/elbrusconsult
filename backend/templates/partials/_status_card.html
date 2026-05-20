@@ -1,0 +1,71 @@
+{% load icons %}{% comment %}
+Centered status card used by thanks / pending / confirmed / unsubscribed /
+ratelimited pages. Combines a tile-gradient icon, a `font-display`
+heading, and a short paragraph inside a `card-glass` shell, all sitting on
+top of the `topographic-bg` so the page never feels empty.
+
+Context variables (all optional except `status_heading`):
+
+- ``status_icon``    — Heroicon name for the top icon tile. Defaults to
+                       ``"sparkles"`` when omitted.
+- ``status_eyebrow`` — small aurora-tinted label above the heading.
+- ``status_heading`` — main heading (escaped plain text).
+- ``status_lead``    — supporting paragraph below the heading.
+- ``status_tone``    — visual tone of the icon tile. Currently:
+                       ``"success"`` (default, aurora gradient),
+                       ``"warning"`` (amber-tinted),
+                       ``"info"`` (slate-tinted),
+                       ``"farewell"`` (muted aurora).
+- ``status_primary_cta_label`` / ``status_primary_cta_url``
+                       optional solid summit-colored primary CTA.
+- ``status_secondary_cta_label`` / ``status_secondary_cta_url``
+                       optional outlined secondary CTA.
+{% endcomment %}
+
+<section class="relative isolate overflow-hidden bg-slate-50">
+  <div class="topographic-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+
+  <div class="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-20 lg:py-24">
+    <div class="card-glass relative flex flex-col items-center gap-5 p-10 text-center"
+         data-reveal="card">
+      <span class="tile-gradient inline-flex h-16 w-16 items-center justify-center rounded-2xl text-white shadow-tile-glow ring-1 ring-white/15
+                   {% if status_tone == 'warning' %}!bg-[linear-gradient(135deg,_#b45309_0%,_#f59e0b_55%,_#fde68a_100%)]
+                   {% elif status_tone == 'info' %}!bg-[linear-gradient(135deg,_#1e293b_0%,_#475569_55%,_#94a3b8_100%)]
+                   {% elif status_tone == 'farewell' %}!bg-[linear-gradient(135deg,_#0f4d8c_0%,_#475569_55%,_#94a3b8_100%)]
+                   {% endif %}">
+        {% heroicon status_icon|default:"sparkles" class="h-8 w-8" %}
+      </span>
+
+      {% if status_eyebrow %}
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-aurora-700">{{ status_eyebrow }}</p>
+      {% endif %}
+
+      <h1 class="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900">
+        {{ status_heading }}
+      </h1>
+
+      {% if status_lead %}
+        <p class="text-slate-600 text-base leading-relaxed">{{ status_lead }}</p>
+      {% endif %}
+
+      {% if status_primary_cta_label or status_secondary_cta_label %}
+        <div class="mt-2 flex flex-wrap justify-center gap-3">
+          {% if status_primary_cta_label and status_primary_cta_url %}
+            <a href="{{ status_primary_cta_url }}"
+               class="inline-flex items-center rounded-md bg-summit-600 px-4 py-2 text-white font-medium shadow-sm hover:bg-summit-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-summit-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
+              {{ status_primary_cta_label }}
+            </a>
+          {% endif %}
+          {% if status_secondary_cta_label and status_secondary_cta_url %}
+            <a href="{{ status_secondary_cta_url }}"
+               class="inline-flex items-center rounded-md border border-slate-300 bg-white/60 px-4 py-2 text-slate-700 font-medium hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-summit-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
+              {{ status_secondary_cta_label }}
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <span class="card-glass-glow" aria-hidden="true"></span>
+    </div>
+  </div>
+</section>

@@ -1,48 +1,88 @@
 {% extends "base.html" %}
-{% load seo_tags %}
+{% load icons seo_tags %}
 
 {% block extra_head %}
   {% json_ld service_schema %}
 {% endblock %}
 
 {% block content %}
-  <article class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-20">
-    <nav aria-label="Breadcrumb" class="text-sm text-slate-500">
-      <ol class="flex flex-wrap gap-2">
-        <li><a class="hover:text-summit-700" href="{% url 'home' %}">Home</a> /</li>
-        <li><a class="hover:text-summit-700" href="{% url 'services-list' %}">Services</a> /</li>
-        <li class="text-slate-700">{{ service.name }}</li>
-      </ol>
-    </nav>
-
-    <header class="mt-6">
-      <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900">{{ service.name }}</h1>
-      <p class="mt-3 text-lg text-slate-600">{{ service.tagline }}</p>
-    </header>
-
-    <div class="mt-8 text-slate-800 leading-relaxed">
-      <p class="text-lg">{{ service.summary }}</p>
+  <section class="relative isolate overflow-hidden bg-gradient-to-br from-summit-700 via-summit-800 to-slate-900 text-white">
+    <div class="absolute inset-0 -z-10 opacity-20 [mask-image:radial-gradient(white,transparent_70%)]"
+         aria-hidden="true">
+      <svg viewBox="0 0 800 600" class="h-full w-full" preserveAspectRatio="xMidYMid slice">
+        <path d="M0 480 L150 280 L260 360 L380 180 L500 320 L620 220 L800 360 L800 600 L0 600 Z"
+              fill="currentColor" class="text-summit-500"/>
+      </svg>
     </div>
+    <div class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-slate-50/15"
+         aria-hidden="true"></div>
 
-    {% if body_html %}
-      <div class="prose prose-slate mt-8 max-w-none">
-        {{ body_html|safe }}
-      </div>
-    {% endif %}
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+      <nav aria-label="Breadcrumb" class="text-sm text-summit-200">
+        <ol class="flex flex-wrap items-center gap-2">
+          <li><a class="transition-colors hover:text-white" href="{% url 'home' %}">Home</a></li>
+          <li aria-hidden="true" class="text-summit-300">/</li>
+          <li><a class="transition-colors hover:text-white" href="{% url 'services-list' %}">Services</a></li>
+          <li aria-hidden="true" class="text-summit-300">/</li>
+          <li class="text-white">{{ service.name }}</li>
+        </ol>
+      </nav>
 
-    <aside class="mt-12 rounded-lg bg-slate-50 border border-slate-200 p-6">
-      <h2 class="text-xl font-semibold text-slate-900">Want to talk about {{ service.name|lower }}?</h2>
-      <p class="mt-2 text-slate-700">Book a free consultation or send us a note.</p>
-      <div class="mt-4 flex flex-wrap gap-3">
-        <a href="{% url 'schedule' %}"
-           class="inline-flex items-center rounded-md bg-summit-600 px-4 py-2 text-white font-medium hover:bg-summit-700">
-          Schedule a call
-        </a>
-        <a href="{% url 'contact' %}"
-           class="inline-flex items-center rounded-md border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-100">
-          Contact us
-        </a>
+      <div class="mt-6 flex items-center gap-4">
+        <span class="tile-gradient inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-white shadow-tile-glow ring-1 ring-white/15">
+          {% heroicon service.icon|default:"sparkles" class="h-7 w-7" %}
+        </span>
+        <p class="text-aurora-300 text-sm font-semibold uppercase tracking-[0.2em]">Service</p>
       </div>
-    </aside>
-  </article>
+
+      <h1 class="mt-4 font-display text-4xl sm:text-5xl font-bold tracking-tight"
+          data-reveal="card">
+        {{ service.name }}
+      </h1>
+      <p class="mt-4 text-lg text-summit-100 max-w-2xl"
+         data-reveal="card" data-reveal-stagger="1">{{ service.tagline }}</p>
+    </div>
+  </section>
+
+  <section class="relative isolate overflow-hidden bg-slate-50">
+    <div class="topographic-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+
+    <article class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+      <p class="font-display text-xl leading-relaxed text-slate-800"
+         data-reveal="card">
+        {{ service.summary }}
+      </p>
+
+      {% if body_html %}
+        <div class="prose prose-slate mt-10 max-w-none" data-reveal="card" data-reveal-stagger="1">
+          {{ body_html|safe }}
+        </div>
+      {% endif %}
+
+      <aside class="mt-16 card-glass relative flex flex-col gap-4 p-8 lg:p-10"
+             data-reveal="card">
+        {% include "partials/_service_icon_tile.html" with icon="paper-airplane" %}
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-aurora-700">Take the next step</p>
+        <h2 class="font-display text-2xl font-semibold tracking-tight text-slate-900">
+          Want to talk about {{ service.name|lower }}?
+        </h2>
+        <p class="text-slate-600 leading-relaxed">
+          Book a free 30-minute consultation or drop us a note &mdash; a senior consultant
+          will respond personally.
+        </p>
+        <div class="mt-2 flex flex-wrap gap-3">
+          <a href="{% url 'schedule' %}"
+             class="inline-flex items-center gap-2 rounded-md bg-gradient-to-br from-summit-700 via-summit-600 to-aurora-700 px-4 py-2 text-white font-semibold shadow-sm transition hover:shadow-[0_8px_24px_-12px_rgba(0,217,255,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
+            Schedule a call
+            {% heroicon "arrow-right" class="h-4 w-4" %}
+          </a>
+          <a href="{% url 'contact' %}"
+             class="inline-flex items-center rounded-md border border-slate-300 bg-white/60 px-4 py-2 text-slate-700 font-medium hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-summit-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
+            Contact us
+          </a>
+        </div>
+        <span class="card-glass-glow" aria-hidden="true"></span>
+      </aside>
+    </article>
+  </section>
 {% endblock %}
