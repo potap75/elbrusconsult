@@ -62,6 +62,11 @@
         "parameter": [
           {
             "type": "TEMPLATE",
+            "key": "measurementIdOverride",
+            "value": "{{GA4 Measurement ID}}"
+          },
+          {
+            "type": "TEMPLATE",
             "key": "eventName",
             "value": "generate_lead"
           },
@@ -135,6 +140,11 @@
         "parameter": [
           {
             "type": "TEMPLATE",
+            "key": "measurementIdOverride",
+            "value": "{{GA4 Measurement ID}}"
+          },
+          {
+            "type": "TEMPLATE",
             "key": "eventName",
             "value": "sign_up"
           },
@@ -206,6 +216,11 @@
         "name": "GA4 — book_appointment — calendar",
         "type": "gaawe",
         "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "measurementIdOverride",
+            "value": "{{GA4 Measurement ID}}"
+          },
           {
             "type": "TEMPLATE",
             "key": "eventName",
@@ -294,6 +309,11 @@
         "name": "GA4 — reschedule_appointment — calendar",
         "type": "gaawe",
         "parameter": [
+          {
+            "type": "TEMPLATE",
+            "key": "measurementIdOverride",
+            "value": "{{GA4 Measurement ID}}"
+          },
           {
             "type": "TEMPLATE",
             "key": "eventName",
