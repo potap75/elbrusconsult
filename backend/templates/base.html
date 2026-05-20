@@ -15,10 +15,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   {# Body face (Inter) + display face (Sora) for landing-page headlines. #}
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap">
-  {# Favicons: SVG first for modern browsers (sharpest at any DPR), with        #}
-  {# PNG fallbacks for older browsers and an apple-touch-icon for iOS home     #}
-  {# screen. The black backdrop matches the new brand mark on the OG card.     #}
-  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  {# Favicons are direct PNG rasters of the delivered master art so the tab    #}
+  {# icon, iOS home-screen icon, OG card mark, and nav header all stay         #}
+  {# pixel-faithful to the source. No SVG variant is declared because a hand-  #}
+  {# drafted vector can't replicate the source's organic cloud geometry.       #}
   <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32.png' %}">
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16.png' %}">
   <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon.png' %}">
