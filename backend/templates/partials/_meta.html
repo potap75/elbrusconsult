@@ -2,7 +2,8 @@
 <meta name="description" content="{{ seo_description|default:SITE_TAGLINE }}">
 <meta name="robots" content="{{ seo_robots|default:'index,follow' }}">
 <meta name="author" content="{{ SITE_NAME }}">
-<meta name="theme-color" content="#0f172a">
+{# theme-color is declared in base.html alongside the favicon set, so all
+   browser-chrome tints live in one place. #}
 
 <link rel="canonical" href="{{ seo_canonical_url|default:default_canonical_url }}">
 
