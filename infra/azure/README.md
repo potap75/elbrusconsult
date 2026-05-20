@@ -319,7 +319,82 @@ those directives intentionally.
 
 ---
 
-## 7. Operational notes
+## 7. CI/CD via GitHub Actions
+
+`.github/workflows/deploy.yml` is the canonical deploy path. Every push and
+PR to `main` runs `pytest` and a Tailwind build; pushes (not PRs)
+additionally invoke `sudo /usr/local/sbin/elbrus-bootstrap` on the
+`elbrus-app` VM via `az vm run-command`, then verify the site is live with
+a `curl https://elbruscloud.com/healthz` smoke check (six retries, 30s
+total). The manual deploy path documented in section 5 remains the
+fallback for emergency rollbacks or when CI is unavailable.
+
+Authentication to Azure is via OIDC federated identity, so there are no
+long-lived secrets stored in GitHub.
+
+### One-time setup
+
+1. Log in to the Azure CLI on your laptop and select the right subscription:
+
+   ```bash
+   az login
+   az account set --subscription "<name-or-id of the sub that hosts elbrus-app>"
+   ```
+
+2. Run the provisioning script from the repo root:
+
+   ```bash
+   bash infra/azure/github-actions-setup.sh
+   ```
+
+   This creates an AAD app registration, a matching service principal,
+   grants it `Virtual Machine Contributor` scoped to **only** the
+   `elbrus-app` VM (no broader access), and adds a federated credential
+   binding the GitHub repo + `refs/heads/main` to that identity. The
+   script is idempotent — re-running it is safe.
+
+3. Paste the five values it prints into **Settings → Secrets and variables
+   → Actions → Variables** on the GitHub repo (Variables tab, *not*
+   Secrets — these are non-sensitive identifiers):
+
+   | Variable name           | Value                                    |
+   |-------------------------|------------------------------------------|
+   | `AZURE_CLIENT_ID`       | App registration `appId`                 |
+   | `AZURE_TENANT_ID`       | Tenant ID                                |
+   | `AZURE_SUBSCRIPTION_ID` | Subscription ID                          |
+   | `AZURE_RG`              | `RG-ELBRUSCLOUD`                         |
+   | `AZURE_VM`              | `elbrus-app`                             |
+
+4. Push a trivial commit to `main`. The `deploy` workflow should run
+   end-to-end and finish with a green `/healthz` check.
+
+### Day-to-day
+
+- Open a PR to `main` → tests run, deploy is skipped.
+- Merge to `main` → tests run, then deploy fires.
+- Concurrency group `deploy-prod` queues overlapping deploys instead of
+  cancelling them, so two rapid merges land in order.
+- The federated credential is bound to `refs/heads/main` only, so PRs
+  from forks cannot mint Azure tokens.
+
+### When `/healthz` fails after a deploy
+
+1. Open the workflow run on GitHub and read the bootstrap output captured
+   under the **"Run bootstrap on the VM"** step (last 150 lines).
+2. SSH in and tail Gunicorn:
+
+   ```bash
+   ssh elbrusops@<public-ip>
+   journalctl -u gunicorn -f
+   ```
+
+3. If the deploy left the box in a broken state, roll forward with a
+   revert commit (which will trigger a fresh deploy) or use the manual
+   step-by-step path in section 5 to fix in place.
+
+---
+
+## 8. Operational notes
 
 - **Logs:** `journalctl -u gunicorn -f` and `/var/log/nginx/*.log`.
 - **Health check:** `https://elbruscloud.com/healthz`.

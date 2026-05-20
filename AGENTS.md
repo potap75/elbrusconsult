@@ -294,7 +294,20 @@ Nginx site, and reloads services.
 
 ### Redeploying
 
-The recommended path is just re-running the bootstrap script:
+The canonical deploy path is `.github/workflows/deploy.yml`: every push
+to `main` runs `pytest` + a Tailwind build, then (only on `push`, not
+PRs) invokes `sudo /usr/local/sbin/elbrus-bootstrap` on the
+`elbrus-app` VM via `az vm run-command` and verifies the site with a
+`curl https://elbruscloud.com/healthz` smoke check. Auth uses OIDC
+federated identity — no long-lived secrets in GitHub. Concurrency
+group `deploy-prod` queues overlapping deploys instead of cancelling
+them. See `infra/azure/README.md` section 7 for the one-time setup
+(run `infra/azure/github-actions-setup.sh`, then add five repo
+variables).
+
+The fallback path — when CI is down, you need to skip a step, or
+you're doing an emergency rollback — is re-running the bootstrap
+script directly on the VM:
 
 ```bash
 sudo /usr/local/sbin/elbrus-bootstrap
@@ -382,5 +395,8 @@ inside `core.middleware._SCRIPT_SRC_VENDORS` / `_CONNECT_SRC_VENDORS` /
 `_IMG_SRC_VENDORS`, and a test asserting the tag does and does not render
 based on the env var.
 - Prefer editing `infra/deploy/bootstrap.sh` over inventing new deploy
-steps - it is the single source of truth for "what runs on the VM".
+steps - it is the single source of truth for "what runs on the VM". The
+CI workflow in `.github/workflows/deploy.yml` deliberately calls
+`elbrus-bootstrap` rather than reimplementing the deploy logic, so any
+change to "how we deploy" should land in the bootstrap script first.
 
