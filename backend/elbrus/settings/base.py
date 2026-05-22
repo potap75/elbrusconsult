@@ -61,6 +61,7 @@ SITE_DEFAULT_OG_IMAGE = env(
 SITE_TWITTER_HANDLE = env("SITE_TWITTER_HANDLE", default="")
 INFO_EMAIL = env("INFO_EMAIL", default="info@elbruscloud.com")
 CONTACT_RECIPIENT_EMAIL = env("CONTACT_RECIPIENT_EMAIL", default=INFO_EMAIL)
+SITE_ADVISORY_PHONE = env("SITE_ADVISORY_PHONE", default="+1 (704) 686-8481")
 
 # ----------------------------------------------------------------------------
 # Analytics, Tag Manager & paid channels

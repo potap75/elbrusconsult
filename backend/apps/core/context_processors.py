@@ -5,6 +5,7 @@ from django.conf import settings
 from django.http import HttpRequest
 
 from .schema import organization_schema, website_schema
+from .utils import phone_tel_uri
 
 
 def site_context(request: HttpRequest) -> dict:
@@ -19,6 +20,8 @@ def site_context(request: HttpRequest) -> dict:
         "SITE_DEFAULT_OG_IMAGE": settings.SITE_DEFAULT_OG_IMAGE,
         "SITE_TWITTER_HANDLE": settings.SITE_TWITTER_HANDLE,
         "INFO_EMAIL": settings.INFO_EMAIL,
+        "SITE_ADVISORY_PHONE": settings.SITE_ADVISORY_PHONE,
+        "SITE_ADVISORY_PHONE_TEL": phone_tel_uri(settings.SITE_ADVISORY_PHONE),
         "default_canonical_url": canonical_url,
         "organization_schema": organization_schema(),
         "website_schema": website_schema(),

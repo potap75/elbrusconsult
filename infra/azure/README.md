@@ -111,6 +111,7 @@ SITE_URL=https://elbruscloud.com
 SITE_DEFAULT_OG_IMAGE=/static/img/og-default.png
 INFO_EMAIL=info@elbruscloud.com
 CONTACT_RECIPIENT_EMAIL=info@elbruscloud.com
+SITE_ADVISORY_PHONE=+1 (704) 686-8481
 
 DATABASE_URL=postgres://elbrusdba:<password>@elbrus-pg.postgres.database.azure.com:5432/elbrus?sslmode=require
 

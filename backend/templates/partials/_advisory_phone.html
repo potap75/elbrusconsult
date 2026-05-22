@@ -1,0 +1,63 @@
+{% comment %}
+Reusable advisory phone block. Renders only when SITE_ADVISORY_PHONE is set.
+
+Variants:
+  inline (default) — compact link + disclosure for footer
+  hero             — outlined CTA button for dark hero backgrounds
+  stack            — phone row for light card/aside backgrounds
+  card             — full glass-card block with icon tile (contact page)
+{% endcomment %}
+{% load icons %}
+{% if SITE_ADVISORY_PHONE and SITE_ADVISORY_PHONE_TEL %}
+  {% if variant == "hero" %}
+    <a href="{{ SITE_ADVISORY_PHONE_TEL }}"
+       class="inline-flex items-center rounded-md border border-white/30 px-5 py-3 font-semibold hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-300 focus-visible:ring-offset-2 focus-visible:ring-offset-summit-800"
+       data-track="phone_click">
+      Call for advice
+    </a>
+  {% elif variant == "stack" %}
+    <div class="mt-2">
+      <a href="{{ SITE_ADVISORY_PHONE_TEL }}"
+         class="inline-flex items-center gap-2 font-semibold text-summit-800 hover:text-summit-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
+         data-track="phone_click">
+        {% heroicon "phone" class="h-5 w-5 text-aurora-700" %}
+        {{ SITE_ADVISORY_PHONE }}
+      </a>
+      <p class="mt-1 text-xs text-slate-500">Paid advisory line</p>
+    </div>
+  {% elif variant == "card" %}
+    <div class="card-glass relative flex flex-col gap-4 p-6 sm:p-8 mb-8" data-reveal="card">
+      <div class="flex items-center gap-3">
+        {% include "partials/_service_icon_tile.html" with icon="phone" %}
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-aurora-700">Prefer to talk?</p>
+          <p class="font-display text-lg font-semibold tracking-tight text-slate-900">Speak with a senior consultant.</p>
+        </div>
+      </div>
+      <p class="text-slate-600 leading-relaxed">
+        Call our cybersecurity advice line for immediate guidance on architecture,
+        controls, or incident response.
+      </p>
+      <div>
+        <a href="{{ SITE_ADVISORY_PHONE_TEL }}"
+           class="inline-flex items-center gap-2 text-lg font-semibold text-summit-800 hover:text-summit-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
+           data-track="phone_click">
+          {% heroicon "phone" class="h-5 w-5 text-aurora-700" %}
+          {{ SITE_ADVISORY_PHONE }}
+        </a>
+        <p class="mt-1 text-xs text-slate-500">Paid advisory line</p>
+      </div>
+      <span class="card-glass-glow" aria-hidden="true"></span>
+    </div>
+  {% else %}
+    <p class="mt-2 text-sm">
+      <a href="{{ SITE_ADVISORY_PHONE_TEL }}"
+         class="inline-flex items-center gap-1.5 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded-sm"
+         data-track="phone_click">
+        {% heroicon "phone" class="h-4 w-4" %}
+        {{ SITE_ADVISORY_PHONE }}
+      </a>
+    </p>
+    <p class="mt-1 text-xs text-slate-400">Paid advisory line</p>
+  {% endif %}
+{% endif %}

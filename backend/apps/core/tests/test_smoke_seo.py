@@ -126,6 +126,29 @@ def test_contact_detail_emits_local_business_jsonld():
     assert response.status_code == 200
     body = response.content.decode("utf-8")
     assert '"@type":"LocalBusiness"' in body
+    assert '"telephone":"+1 (704) 686-8481"' in body
+
+
+@pytest.mark.django_db
+def test_home_includes_advisory_phone_link():
+    client = Client()
+    response = client.get(reverse("home"))
+    assert response.status_code == 200
+    body = response.content.decode("utf-8")
+    assert 'href="tel:+17046868481"' in body
+    assert "Paid advisory line" in body
+    assert "Call for advice" in body
+
+
+@pytest.mark.django_db
+def test_organization_jsonld_includes_advisory_phone():
+    client = Client()
+    response = client.get(reverse("home"))
+    assert response.status_code == 200
+    body = response.content.decode("utf-8")
+    assert '"@type":"Organization"' in body
+    assert '"telephone":"+1 (704) 686-8481"' in body
+    assert "/static/img/logo.png" in body
 
 
 @pytest.mark.django_db

@@ -33,6 +33,7 @@
            class="inline-flex items-center rounded-md border border-white/30 px-5 py-3 font-semibold hover:bg-white/10">
           Explore services
         </a>
+        {% include "partials/_advisory_phone.html" with variant="hero" %}
       </div>
     </div>
   </section>
@@ -128,6 +129,7 @@
           Tell us about your environment and we&rsquo;ll recommend the right starting point &mdash;
           no obligation, no junior handoff.
         </p>
+        {% include "partials/_advisory_phone.html" with variant="stack" %}
         <div class="mt-2 flex flex-wrap gap-3">
           <a href="{% url 'contact' %}"
              class="inline-flex items-center gap-2 rounded-md bg-gradient-to-br from-summit-700 via-summit-600 to-aurora-700 px-4 py-2 text-white font-semibold shadow-sm transition hover:shadow-[0_8px_24px_-12px_rgba(0,217,255,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aurora-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">

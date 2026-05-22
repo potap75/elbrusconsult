@@ -63,4 +63,15 @@
       observer.observe(n);
     });
   });
+
+  /* Advisory phone clicks — fan out through the GTM shim so paid
+   * channels can map tel: taps to call conversions without touching
+   * every template again. Payload is PII-free by design. */
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest("[data-track='phone_click']");
+    if (!link || typeof window.elbrusTrack !== "function") {
+      return;
+    }
+    window.elbrusTrack("phone_click", { conversion_type: "call" });
+  });
 })();

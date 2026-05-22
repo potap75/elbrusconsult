@@ -80,6 +80,8 @@ class ContactView(SeoMixin, FormView):
             "url": settings.SITE_URL,
             "email": settings.INFO_EMAIL,
         }
+        if settings.SITE_ADVISORY_PHONE:
+            context["local_business_schema"]["telephone"] = settings.SITE_ADVISORY_PHONE
         context["breadcrumb_schema"] = breadcrumb_schema(self.get_breadcrumbs())
         return context
 

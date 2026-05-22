@@ -6,16 +6,19 @@ from django.conf import settings
 
 def organization_schema() -> dict:
     """Site-wide Organization payload."""
-    return {
+    payload: dict = {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": settings.SITE_NAME,
         "url": settings.SITE_URL,
-        "logo": f"{settings.SITE_URL}/static/img/logo.svg",
+        "logo": f"{settings.SITE_URL}/static/img/logo.png",
         "description": settings.SITE_TAGLINE,
         "email": settings.INFO_EMAIL,
         "sameAs": [],
     }
+    if settings.SITE_ADVISORY_PHONE:
+        payload["telephone"] = settings.SITE_ADVISORY_PHONE
+    return payload
 
 
 def website_schema() -> dict:
