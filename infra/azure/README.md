@@ -122,14 +122,14 @@ EMAIL_HOST_PASSWORD=<smtp-pass>
 EMAIL_USE_TLS=True
 DEFAULT_FROM_EMAIL=Elbrus Cloud <no-reply@elbruscloud.com>
 
-# Analytics & paid-channel tag manager (all optional; tags only render when set)
-# GTM is the single source of truth for marketing pixels — configure GA4,
-# Google Ads, LinkedIn Insight, Meta Pixel, Microsoft UET, and TikTok Pixel
-# INSIDE the GTM container, not as separate <script> tags in this repo.
+# Analytics & paid-channel tags (all optional; tags only render when set)
+# GTM handles conversion events. GA4 pageviews, LinkedIn Insight, and
+# Microsoft UET load directly from _analytics_head.html (consent-gated).
+# Meta / TikTok / Google Ads conversion tags belong in the GTM container.
 GTM_CONTAINER_ID=GTM-5LFJD8D4
 GA4_MEASUREMENT_ID=G-JD3TKNY687
 GOOGLE_ADS_CONVERSION_ID=
-LINKEDIN_PARTNER_ID=
+LINKEDIN_PARTNER_ID=9255234
 META_PIXEL_ID=
 BING_UET_TAG_ID=343256862
 TIKTOK_PIXEL_ID=

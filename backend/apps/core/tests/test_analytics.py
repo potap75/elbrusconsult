@@ -125,6 +125,25 @@ def test_elbrus_track_shim_is_always_emitted_when_analytics_on():
 
 
 @pytest.mark.django_db
+@override_settings(
+    LINKEDIN_PARTNER_ID="9255234",
+    GTM_CONTAINER_ID="",
+    GA4_MEASUREMENT_ID="",
+)
+def test_linkedin_insight_loader_renders_with_consent_gate():
+    client = Client()
+    response = client.get(reverse("home"))
+    body = response.content.decode("utf-8")
+
+    assert "9255234" in body
+    assert "_linkedin_data_partner_ids" in body
+    assert "snap.licdn.com/li.lms-analytics/insight.min.js" in body
+    assert "elbrusLoadLinkedInInsight" in body
+    assert 'localStorage.getItem("elb_consent") === "granted"' in body
+    assert 'id="elbrus-consent"' in body
+
+
+@pytest.mark.django_db
 @override_settings(BING_UET_TAG_ID="343256862", GTM_CONTAINER_ID="", GA4_MEASUREMENT_ID="")
 def test_bing_uet_loader_renders_with_consent_default():
     client = Client()

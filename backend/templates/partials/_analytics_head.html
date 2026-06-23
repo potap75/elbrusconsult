@@ -37,8 +37,9 @@
 {# ------------------------------------------------------------------ #}
 {# Google Tag Manager container loader.                                #}
 {# Single source of truth for ALL marketing/analytics tags in prod:   #}
-{# GA4, Google Ads, LinkedIn Insight, Meta Pixel, Bing UET, TikTok    #}
-{# Pixel. Configure each tag inside the GTM container (NOT here).     #}
+{# GA4, Google Ads, Meta Pixel, TikTok Pixel. LinkedIn Insight and Bing    #}
+{# UET load directly below (consent-gated). Configure conversion tags in    #}
+{# the GTM container.                                                        #}
 {# ------------------------------------------------------------------ #}
 <script{% csp_nonce_attr %}>
   (function(w,d,s,l,i,n){w[l]=w[l]||[];w[l].push({"gtm.start":new Date().getTime(),event:"gtm.js"});
@@ -91,6 +92,39 @@
     ti: "{{ BING_UET_TAG_ID }}",
     enableAutoSpaTracking: true
   });
+</script>
+{% endif %}
+
+{% if LINKEDIN_PARTNER_ID %}
+{# LinkedIn Insight Tag. Partner ID registers without a network call;       #}
+{# insight.min.js loads only after ad consent (default-deny, prior accept, #}
+{# or CONSENT_DEFAULT_GRANTED). Updates flow through consent.js.           #}
+<script{% csp_nonce_attr %}>
+  window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
+  window._linkedin_data_partner_ids.push("{{ LINKEDIN_PARTNER_ID }}");
+  window.elbrusLoadLinkedInInsight = function () {
+    if (window.elbrusLinkedInLoaded) { return; }
+    window.elbrusLinkedInLoaded = true;
+    if (!window.lintrk) {
+      window.lintrk = function (a, b) { window.lintrk.q.push([a, b]); };
+      window.lintrk.q = [];
+    }
+    var s = document.getElementsByTagName("script")[0];
+    var b = document.createElement("script");
+    b.type = "text/javascript";
+    b.async = true;
+    b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
+    s.parentNode.insertBefore(b, s);
+  };
+  {% if CONSENT_DEFAULT_GRANTED %}
+  window.elbrusLoadLinkedInInsight();
+  {% else %}
+  try {
+    if (window.localStorage.getItem("elb_consent") === "granted") {
+      window.elbrusLoadLinkedInInsight();
+    }
+  } catch (e) { /* private mode, storage blocked */ }
+  {% endif %}
 </script>
 {% endif %}
 

@@ -42,6 +42,15 @@
     });
   }
 
+  function pushLinkedInInsight(state) {
+    if (
+      state === GRANTED &&
+      typeof window.elbrusLoadLinkedInInsight === "function"
+    ) {
+      window.elbrusLoadLinkedInInsight();
+    }
+  }
+
   function pushConsentUpdate(state) {
     if (typeof window.gtag !== "function") {
       window.dataLayer = window.dataLayer || [];
@@ -50,6 +59,7 @@
         consent_state: state,
       });
       pushUetConsent(state);
+      pushLinkedInInsight(state);
       return;
     }
     var payload = state === GRANTED
@@ -72,6 +82,7 @@
       consent_state: state,
     });
     pushUetConsent(state);
+    pushLinkedInInsight(state);
   }
 
   function hide(banner) {
