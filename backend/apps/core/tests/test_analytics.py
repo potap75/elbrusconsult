@@ -68,18 +68,16 @@ def test_ga4_direct_loader_renders_when_gtm_unset():
     GTM_CONTAINER_ID="GTM-TEST123",
     GA4_MEASUREMENT_ID="G-TEST",
 )
-def test_gtm_wins_when_both_set():
+def test_gtm_and_ga4_direct_both_load_when_configured():
+    """Pageviews use direct gtag.js; GTM handles conversion events."""
     client = Client()
     response = client.get(reverse("home"))
     body = response.content.decode("utf-8")
 
-    # GTM loader URL is built via JS string concatenation, so the rendered
-    # body contains the gtm.js base and the container ID separately.
     assert "googletagmanager.com/gtm.js" in body
     assert "GTM-TEST123" in body
-    # Direct gtag.js loader is NOT rendered when GTM is configured (GA4
-    # fires through the GTM container instead).
-    assert "gtag/js?id=G-TEST" not in body
+    assert "googletagmanager.com/gtag/js?id=G-TEST" in body
+    assert 'gtag("config", "G-TEST"' in body
 
 
 @pytest.mark.django_db

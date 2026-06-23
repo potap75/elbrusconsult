@@ -47,8 +47,11 @@
   if(n){j.setAttribute("nonce",n);}
   f.parentNode.insertBefore(j,f);})(window,document,"script","dataLayer","{{ GTM_CONTAINER_ID }}","{{ csp_nonce }}");
 </script>
-{% elif GA4_MEASUREMENT_ID %}
-{# GA4 direct fallback for environments that don't run GTM.           #}
+{% endif %}
+{% if GA4_MEASUREMENT_ID %}
+{# GA4 base tag (gtag.js). Loads even when GTM is present: pageviews    #}
+{# fire here; GTM handles conversion events only (no duplicate GA4      #}
+{# Configuration tag in the container). Consent Mode runs above.      #}
 <script{% csp_nonce_attr %} src="https://www.googletagmanager.com/gtag/js?id={{ GA4_MEASUREMENT_ID }}" async></script>
 <script{% csp_nonce_attr %}>
   gtag("js", new Date());

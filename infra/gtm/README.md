@@ -10,17 +10,16 @@ What it ships:
 
 | Kind | Name | Purpose |
 | ---- | ---- | ------- |
-| Variable | `GA4 Measurement ID` | Constant. **Edit after import.** Replace `G-XXXXXXXXXX` with your real GA4 stream ID. |
+| Variable | `GA4 Measurement ID` | Constant (`G-JD3TKNY687`). Used by GA4 Event tags for `measurementIdOverride`. |
 | Variable | `Event - form_id` | Data Layer Variable (`form_id`). |
 | Variable | `Event - conversion_type` | Data Layer Variable (`conversion_type`). |
 | Variable | `Event - appointment_type` | Data Layer Variable (`appointment_type`). |
 | Variable | `Event - duration_minutes` | Data Layer Variable (`duration_minutes`). |
-| Trigger | `Initialization - All Pages` | Fires the Google tag at the earliest possible moment. |
+| Trigger | `Initialization - All Pages` | Reserved (GA4 pageviews load via direct gtag.js in `_analytics_head.html`). |
 | Trigger | `CE — contact_form_submit` | Custom Event trigger, matches the dataLayer push from the contact "thanks" page. |
 | Trigger | `CE — newsletter_subscribe_confirmed` | Custom Event trigger, fired from the newsletter confirm page. |
 | Trigger | `CE — booking_created` | Custom Event trigger, fired from the React scheduling island on first-time booking. |
 | Trigger | `CE — booking_rescheduled` | Custom Event trigger, fired from the React scheduling island on reschedule. |
-| Tag | `GA4 Configuration` | Loads gtag and configures GA4 on every page. Inherits Consent Mode v2 state set by `_analytics_head.html`. |
 | Tag | `GA4 — generate_lead — contact form` | GA4 Event `generate_lead`. Consent-gated on `analytics_storage`. |
 | Tag | `GA4 — sign_up — newsletter` | GA4 Event `sign_up` (method=newsletter). Consent-gated on `analytics_storage`. |
 | Tag | `GA4 — book_appointment — calendar` | GA4 Event `book_appointment`. Consent-gated on `analytics_storage`. |
@@ -36,11 +35,11 @@ All GA4 Event tags are gated by GTM's built-in consent feature on `analytics_sto
 4. Choose workspace: **Default Workspace** (or create one called `import-v1`).
 5. Choose import option: **Merge**, and tick **Overwrite conflicting tags, triggers, and variables**.
 6. Click **Confirm**.
-7. Open the **GA4 Measurement ID** variable in the Variables list and replace `G-XXXXXXXXXX` with your real Measurement ID from GA4 (Admin → Data Streams → Web → copy `G-...`).
+7. Confirm the **GA4 Measurement ID** variable reads `G-JD3TKNY687` (must match `GA4_MEASUREMENT_ID` in `/opt/elbrus/app/.env`).
 8. Click **Preview**, open elbruscloud.com in the connected Tag Assistant tab, and confirm:
-   - `GA4 Configuration` fires on `Initialization`.
+   - Direct `gtag.js` loads with `G-JD3TKNY687` (from `_analytics_head.html`).
    - The four `GA4 — *` event tags appear under their custom events (you can fire them manually from the contact form, newsletter confirm, and booking flows).
-9. **Submit** the workspace as a new container version. Name it `v1 — initial import (5 tags)`.
+9. **Submit** the workspace as a new container version. Name it `v2 — GA4 ID + remove duplicate config tag`.
 10. **Publish**.
 
 ## How to update
