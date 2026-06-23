@@ -12,6 +12,7 @@ from django.urls import reverse
 PUBLIC_ROUTES_BY_NAME = [
     "home",
     "about",
+    "privacy",
     "services-list",
     "blog-list",
     "contact",
@@ -64,7 +65,7 @@ def test_sitemap_lists_static_and_dynamic_urls(seeded_db):
     body = response.content.decode("utf-8")
 
     # Static views
-    for path in ["/", "/about/", "/services/", "/blog/", "/contact/", "/newsletter/", "/schedule/"]:
+    for path in ["/", "/about/", "/privacy/", "/services/", "/blog/", "/contact/", "/newsletter/", "/schedule/"]:
         assert path in body, f"sitemap missing static path {path}"
 
     # At least one service detail and the sample blog post
@@ -149,6 +150,34 @@ def test_organization_jsonld_includes_advisory_phone():
     assert '"@type":"Organization"' in body
     assert '"telephone":"+1 (704) 686-8481"' in body
     assert "/static/img/logo.png" in body
+
+
+@pytest.mark.django_db
+def test_privacy_page_renders_and_is_in_sitemap():
+    client = Client()
+    response = client.get(reverse("privacy"))
+    assert response.status_code == 200
+    body = response.content.decode("utf-8")
+    assert 'id="privacy"' in body
+    assert "Cookie consent" in body or "cookies" in body.lower()
+
+    sitemap = client.get("/sitemap.xml")
+    assert "/privacy/" in sitemap.content.decode("utf-8")
+
+
+@pytest.mark.django_db
+def test_blog_article_jsonld_uses_png_logo(seeded_db):
+    from blog.models import Post
+
+    post = Post.published.first()
+    assert post is not None
+
+    client = Client()
+    response = client.get(post.get_absolute_url())
+    assert response.status_code == 200
+    body = response.content.decode("utf-8")
+    assert "/static/img/logo.png" in body
+    assert "logo.svg" not in body
 
 
 @pytest.mark.django_db

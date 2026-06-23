@@ -98,7 +98,7 @@ class BlogDetailView(SeoMixin, DetailView):
                 "name": settings.SITE_NAME,
                 "logo": {
                     "@type": "ImageObject",
-                    "url": f"{settings.SITE_URL}/static/img/logo.svg",
+                    "url": f"{settings.SITE_URL}/static/img/logo.png",
                 },
             },
             "mainEntityOfPage": {

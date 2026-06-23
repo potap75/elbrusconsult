@@ -22,6 +22,10 @@ class Subscriber(models.Model):
     )
     ip_address = models.GenericIPAddressField(null=True, blank=True)
 
+    # Marketing attribution snapshot (UTMs + paid-channel click IDs). Same
+    # shape as ContactMessage.attribution — see core.attribution.
+    attribution = models.JSONField(default=dict, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -53,6 +53,26 @@ class AboutView(SeoMixin, TemplateView):
         return context
 
 
+class PrivacyView(SeoMixin, TemplateView):
+    template_name = "pages/privacy.html"
+    seo_title = "Privacy & Cookie Notice"
+    seo_description = (
+        "How Elbrus Cloud collects, uses, and protects personal information, "
+        "cookies, analytics, and marketing attribution on elbruscloud.com."
+    )
+
+    def get_breadcrumbs(self) -> list[dict[str, str]]:
+        return [
+            {"name": "Home", "url": "/"},
+            {"name": "Privacy", "url": "/privacy/"},
+        ]
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["breadcrumb_schema"] = breadcrumb_schema(self.get_breadcrumbs())
+        return context
+
+
 class ServiceListView(SeoMixin, ListView):
     template_name = "pages/service_list.html"
     model = Service

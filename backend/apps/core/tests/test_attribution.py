@@ -178,3 +178,24 @@ def test_scheduling_inquiry_persists_attribution(seeded_db):
     inquiry = BookingInquiry.objects.get(email="li-lead@example.com")
     assert inquiry.attribution["last_touch"]["li_fat_id"] == "LI-test-fat-id"
     assert inquiry.attribution["last_touch"]["utm_source"] == "linkedin"
+
+
+@pytest.mark.django_db
+def test_newsletter_subscribe_persists_attribution():
+    client = Client()
+    client.get(
+        reverse("newsletter-subscribe"),
+        {"utm_source": "google", "utm_medium": "cpc", "gclid": "TESTCLICKID-456"},
+    )
+    response = client.post(
+        reverse("newsletter-subscribe"),
+        data={"email": "newsletter-ad@example.com", "website": ""},
+    )
+    assert response.status_code == 302
+
+    from newsletter.models import Subscriber
+
+    sub = Subscriber.objects.get(email="newsletter-ad@example.com")
+    assert sub.attribution
+    assert sub.attribution["last_touch"]["gclid"] == "TESTCLICKID-456"
+    assert sub.attribution["first_touch"]["utm_source"] == "google"

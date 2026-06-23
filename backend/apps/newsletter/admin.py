@@ -8,4 +8,4 @@ class SubscriberAdmin(admin.ModelAdmin):
     list_display = ("email", "status", "source", "created_at", "confirmed_at", "unsubscribed_at")
     list_filter = ("source", "created_at", "confirmed_at", "unsubscribed_at")
     search_fields = ("email", "source")
-    readonly_fields = ("token", "created_at", "updated_at", "ip_address")
+    readonly_fields = ("token", "created_at", "updated_at", "ip_address", "attribution")

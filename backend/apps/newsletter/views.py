@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import FormView, TemplateView
 from django_ratelimit.decorators import ratelimit
 
+from core.attribution import get_attribution_snapshot
 from core.net import get_client_ip
 from core.seo import SeoMixin
 
@@ -35,18 +36,33 @@ class SubscribeView(SeoMixin, FormView):
 
     def form_valid(self, form: SubscribeForm) -> HttpResponse:
         email = form.cleaned_data["email"].lower().strip()
+        attribution = get_attribution_snapshot(self.request)
         subscriber, created = Subscriber.objects.get_or_create(
             email=email,
             defaults={
                 "source": "/newsletter/",
                 "ip_address": get_client_ip(self.request),
+                "attribution": attribution,
             },
         )
         # If they previously unsubscribed, allow them to re-confirm.
         if subscriber.unsubscribed_at:
             subscriber.unsubscribed_at = None
             subscriber.confirmed_at = None
-            subscriber.save(update_fields=["unsubscribed_at", "confirmed_at"])
+            subscriber.ip_address = get_client_ip(self.request)
+            subscriber.attribution = attribution
+            subscriber.save(
+                update_fields=[
+                    "unsubscribed_at",
+                    "confirmed_at",
+                    "ip_address",
+                    "attribution",
+                ]
+            )
+        elif not created:
+            subscriber.ip_address = get_client_ip(self.request)
+            subscriber.attribution = attribution
+            subscriber.save(update_fields=["ip_address", "attribution"])
 
         if not subscriber.is_confirmed:
             send_confirmation_email(subscriber, self.request)

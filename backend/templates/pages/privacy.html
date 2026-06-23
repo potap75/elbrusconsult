@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% include "partials/_page_hero.html" with hero_eyebrow="Legal" hero_heading="Privacy and cookie notice" hero_lead="How we collect, use, and protect information when you visit our site, subscribe to updates, or get in touch." hero_size="md" %}
+
+  <section class="relative isolate overflow-hidden bg-slate-50">
+    <div class="topographic-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+      <article id="privacy" class="prose prose-slate max-w-none" data-reveal="card">
+        <p class="lead">
+          {{ SITE_NAME }} (&ldquo;we&rdquo;, &ldquo;us&rdquo;) respects your privacy. This notice
+          explains what we collect on <a href="{{ SITE_URL }}">{{ SITE_DOMAIN }}</a>, why we
+          collect it, and the choices you have. It applies to visitors, newsletter subscribers,
+          and people who contact us or book a consultation.
+        </p>
+        <p><em>Last updated: {% now "F j, Y" %}.</em></p>
+
+        <h2>Who we are</h2>
+        <p>
+          {{ SITE_NAME }} provides cloud architecture and cybersecurity consulting. You can reach us
+          at <a href="mailto:{{ INFO_EMAIL }}">{{ INFO_EMAIL }}</a>{% if SITE_ADVISORY_PHONE %}
+          or by phone at <a href="{{ SITE_ADVISORY_PHONE_TEL }}">{{ SITE_ADVISORY_PHONE }}</a>{% endif %}.
+        </p>
+
+        <h2>Information we collect</h2>
+        <h3>When you browse the site</h3>
+        <ul>
+          <li><strong>Server logs.</strong> Standard web-server data such as IP address, browser type, pages viewed, and timestamps.</li>
+          <li><strong>Analytics and marketing cookies.</strong> If you accept cookies, we use Google Tag Manager and related tools to measure traffic and campaign performance. We do not load non-essential tags until you consent.</li>
+          <li><strong>Attribution parameters.</strong> UTM campaign tags and paid-channel click identifiers (for example <code>gclid</code>, <code>fbclid</code>) may be stored in first-party cookies so we can understand which campaigns led to a visit or conversion. These values are not shared with other visitors.</li>
+        </ul>
+
+        <h3>When you submit a form</h3>
+        <ul>
+          <li><strong>Contact form.</strong> Name, email, company, subject, and message, plus technical metadata (IP address, user agent) and the attribution snapshot described above.</li>
+          <li><strong>Newsletter.</strong> Email address, signup source, IP address, and attribution snapshot.</li>
+          <li><strong>Scheduling.</strong> Name, email, company, optional phone, appointment details, and attribution snapshot when you book or inquire about a consultation.</li>
+        </ul>
+
+        <h3>Advisory phone line</h3>
+        <p>
+          If you call our public advisory number, standard carrier rates apply. Call metadata
+          (time, duration, caller ID) is handled by our telephony provider according to their
+          privacy policy. We do not record calls unless we tell you otherwise at the start of
+          the conversation.
+        </p>
+
+        <h2>How we use information</h2>
+        <ul>
+          <li>Respond to inquiries and deliver consulting services you request.</li>
+          <li>Send newsletter emails to confirmed subscribers (double opt-in).</li>
+          <li>Operate, secure, and improve our website.</li>
+          <li>Measure marketing effectiveness and attribute leads to campaigns, including offline conversion reporting to ad platforms when you become a customer.</li>
+          <li>Comply with legal obligations and protect against abuse (rate limiting, spam prevention).</li>
+        </ul>
+        <p>We do not sell your personal information.</p>
+
+        <h2>Legal bases (EEA / UK visitors)</h2>
+        <p>
+          Where GDPR applies, we rely on <strong>consent</strong> for non-essential cookies and
+          marketing measurement, <strong>contract</strong> or <strong>pre-contractual steps</strong>
+          when you ask us to provide services, and <strong>legitimate interests</strong> for site
+          security, fraud prevention, and limited analytics in aggregated form.
+        </p>
+
+        <h2>Cookies and consent</h2>
+        <p>
+          On your first visit we ask whether to accept analytics and advertising cookies. You can
+          change your mind by clearing site data in your browser or contacting us. Essential cookies
+          required for security (for example CSRF protection) are always used.
+        </p>
+        <p>Third-party services that may receive data when you consent include:</p>
+        <ul>
+          <li>Google Tag Manager / Google Analytics</li>
+          <li>Google Ads (conversion measurement)</li>
+          <li>LinkedIn, Meta, Microsoft Bing, and TikTok (when configured for campaign measurement)</li>
+        </ul>
+
+        <h2>Retention</h2>
+        <p>
+          Contact messages, bookings, and newsletter records are kept as long as needed to provide
+          services, maintain business records, and meet legal requirements. You may ask us to delete
+          information that is no longer required.
+        </p>
+
+        <h2>Your choices</h2>
+        <ul>
+          <li><strong>Newsletter.</strong> Every message includes an unsubscribe link.</li>
+          <li><strong>Access / deletion.</strong> Email <a href="mailto:{{ INFO_EMAIL }}">{{ INFO_EMAIL }}</a> with your request.</li>
+          <li><strong>Cookies.</strong> Use the consent banner or your browser settings to limit tracking.</li>
+        </ul>
+
+        <h2>Security</h2>
+        <p>
+          We use HTTPS, access controls, rate limiting, and industry-standard hosting practices.
+          No method of transmission over the Internet is completely secure; we work to protect
+          data in proportion to its sensitivity.
+        </p>
+
+        <h2>Changes</h2>
+        <p>
+          We may update this notice from time to time. Material changes will be reflected on this
+          page with a revised &ldquo;Last updated&rdquo; date.
+        </p>
+
+        <h2>Contact</h2>
+        <p>
+          Questions about this notice? Email
+          <a href="mailto:{{ INFO_EMAIL }}">{{ INFO_EMAIL }}</a> or use our
+          <a href="{% url 'contact' %}">contact form</a>.
+        </p>
+      </article>
+    </div>
+  </section>
+{% endblock %}
