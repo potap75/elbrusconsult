@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 from django.core import mail
@@ -11,7 +11,7 @@ from django.urls import reverse
 
 from scheduling.models import Booking
 
-from .conftest import et_at
+from .conftest import et_at, future_monday
 
 
 def _post_booking(client: Client, payload: dict) -> "object":
@@ -53,7 +53,7 @@ def test_slots_endpoint_returns_iso_strings(
     discovery_call, weekday_business_hours
 ):
     client = Client()
-    monday = date(2026, 6, 8)
+    monday = future_monday()
     resp = client.get(
         reverse("scheduling-api-slots"),
         {"type": "discovery-call", "from": str(monday), "to": str(monday)},
@@ -82,7 +82,7 @@ def test_slots_endpoint_requires_params():
 def test_create_booking_happy_path(discovery_call, weekday_business_hours):
     mail.outbox.clear()
     client = Client(enforce_csrf_checks=False)
-    monday = date(2026, 6, 8)
+    monday = future_monday()
     start = et_at(monday, 10, 0)
     resp = _post_booking(
         client,
@@ -117,7 +117,7 @@ def test_create_booking_happy_path(discovery_call, weekday_business_hours):
 )
 def test_double_booking_returns_409(discovery_call, weekday_business_hours):
     client = Client(enforce_csrf_checks=False)
-    monday = date(2026, 6, 8)
+    monday = future_monday()
     start = et_at(monday, 11, 0)
     payload = {
         "appointment_type": "discovery-call",
@@ -147,7 +147,7 @@ def test_double_booking_returns_409(discovery_call, weekday_business_hours):
 def test_tampered_start_at_is_rejected(discovery_call, weekday_business_hours):
     """A start_at that doesn't align with the slot grid (e.g. 10:17) is rejected."""
     client = Client(enforce_csrf_checks=False)
-    monday = date(2026, 6, 8)
+    monday = future_monday()
     bogus = et_at(monday, 10, 17)
     resp = _post_booking(
         client,
@@ -172,7 +172,7 @@ def test_tampered_start_at_is_rejected(discovery_call, weekday_business_hours):
 )
 def test_weekend_booking_is_rejected(discovery_call, weekday_business_hours):
     client = Client(enforce_csrf_checks=False)
-    saturday = date(2026, 6, 6)
+    saturday = future_monday() - timedelta(days=2)
     resp = _post_booking(
         client,
         {
@@ -214,7 +214,7 @@ def test_reschedule_cancels_original_and_creates_new(
     discovery_call, weekday_business_hours
 ):
     client = Client(enforce_csrf_checks=False)
-    monday = date(2026, 6, 8)
+    monday = future_monday()
     start = et_at(monday, 10, 0)
     first = _post_booking(
         client,
@@ -261,7 +261,7 @@ def test_slots_endpoint_with_reschedule_token_treats_original_as_free(
     discovery_call, weekday_business_hours
 ):
     client = Client(enforce_csrf_checks=False)
-    monday = date(2026, 6, 8)
+    monday = future_monday()
     start = et_at(monday, 10, 0)
     first = _post_booking(
         client,
@@ -303,7 +303,7 @@ def test_slots_endpoint_with_reschedule_token_treats_original_as_free(
 )
 def test_booking_lookup_endpoint(discovery_call, weekday_business_hours):
     client = Client(enforce_csrf_checks=False)
-    monday = date(2026, 6, 8)
+    monday = future_monday()
     start = et_at(monday, 10, 0)
     first = _post_booking(
         client,

@@ -93,3 +93,14 @@ def et_at(d: date, h: int, m: int = 0) -> datetime:
     """Construct a UTC datetime from a local America/New_York wall time."""
     local = datetime.combine(d, time(h, m), tzinfo=ZoneInfo("America/New_York"))
     return local.astimezone(timezone.utc)
+
+
+def future_monday(*, offset_weeks: int = 1) -> date:
+    """Return a Monday far enough in the future for booking API tests."""
+    from django.utils import timezone as dj_tz
+
+    today = dj_tz.localdate()
+    days_ahead = (7 - today.weekday()) % 7
+    if days_ahead == 0:
+        days_ahead = 7
+    return today + timedelta(days=days_ahead + 7 * (offset_weeks - 1))
