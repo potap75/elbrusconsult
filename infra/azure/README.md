@@ -126,7 +126,7 @@ DEFAULT_FROM_EMAIL=Elbrus Cloud <no-reply@elbruscloud.com>
 # GTM is the single source of truth for marketing pixels — configure GA4,
 # Google Ads, LinkedIn Insight, Meta Pixel, Microsoft UET, and TikTok Pixel
 # INSIDE the GTM container, not as separate <script> tags in this repo.
-GTM_CONTAINER_ID=GTM-W78SVVN2
+GTM_CONTAINER_ID=GTM-5LFJD8D4
 GA4_MEASUREMENT_ID=G-JD3TKNY687
 GOOGLE_ADS_CONVERSION_ID=
 LINKEDIN_PARTNER_ID=

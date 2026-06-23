@@ -50,6 +50,6 @@ For brand-new tags or paid-channel additions (LinkedIn Insight Tag, Meta Pixel, 
 
 ## Wiring to the site
 
-The site loads this container automatically when `GTM_CONTAINER_ID=GTM-W78SVVN2` is set in `.env` (it already is on prod). Consent defaults to denied; the consent banner (`backend/templates/partials/_consent_banner.html` + `backend/static/src/consent.js`) calls `gtag('consent', 'update', ...)` when the visitor accepts, which lets the consent-gated GA4 Event tags fire.
+The site loads this container automatically when `GTM_CONTAINER_ID=GTM-5LFJD8D4` is set in `.env` (it already is on prod). Consent defaults to denied; the consent banner (`backend/templates/partials/_consent_banner.html` + `backend/static/src/consent.js`) calls `gtag('consent', 'update', ...)` when the visitor accepts, which lets the consent-gated GA4 Event tags fire.
 
 The dataLayer events pushed from the Django backend / React island are in `backend/templates/partials/_analytics_head.html` and `frontend/scheduling-island/src/StepDone.tsx`. If you change an event name here, update the corresponding `CE — *` trigger in the JSON above.
