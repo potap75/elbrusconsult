@@ -60,8 +60,9 @@ _SCRIPT_SRC_VENDORS = (
     "https://snap.licdn.com",
     # Meta Pixel
     "https://connect.facebook.net",
-    # Microsoft Advertising UET
+    # Microsoft Advertising UET (bat.js served from .net; legacy .com still used)
     "https://bat.bing.com",
+    "https://bat.bing.net",
     "https://*.clarity.ms",
     # TikTok Pixel
     "https://analytics.tiktok.com",
@@ -80,6 +81,7 @@ _CONNECT_SRC_VENDORS = (
     "https://www.facebook.com",
     "https://*.facebook.com",
     "https://bat.bing.com",
+    "https://bat.bing.net",
     "https://*.clarity.ms",
     "https://analytics.tiktok.com",
     "https://*.tiktok.com",
@@ -99,6 +101,7 @@ _IMG_SRC_VENDORS = (
     "https://www.facebook.com",
     "https://*.facebook.com",
     "https://bat.bing.com",
+    "https://bat.bing.net",
     "https://*.clarity.ms",
     "https://analytics.tiktok.com",
 )

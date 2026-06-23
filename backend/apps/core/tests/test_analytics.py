@@ -125,6 +125,20 @@ def test_elbrus_track_shim_is_always_emitted_when_analytics_on():
 
 
 @pytest.mark.django_db
+@override_settings(BING_UET_TAG_ID="343256862", GTM_CONTAINER_ID="", GA4_MEASUREMENT_ID="")
+def test_bing_uet_loader_renders_with_consent_default():
+    client = Client()
+    response = client.get(reverse("home"))
+    body = response.content.decode("utf-8")
+
+    assert "bat.bing.net/bat.js?ti=" in body
+    assert "343256862" in body
+    assert "enableAutoSpaTracking" in body
+    assert 'window.uetq.push("consent", "default"' in body
+    assert 'id="elbrus-consent"' in body
+
+
+@pytest.mark.django_db
 @override_settings(GTM_CONTAINER_ID="GTM-TEST123")
 def test_contact_thanks_page_pushes_lead_conversion():
     """The contact form's thanks page must push a conversion event so GTM

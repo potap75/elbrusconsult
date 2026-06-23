@@ -35,6 +35,13 @@
     }
   }
 
+  function pushUetConsent(state) {
+    window.uetq = window.uetq || [];
+    window.uetq.push("consent", "update", {
+      ad_storage: state === GRANTED ? "granted" : "denied",
+    });
+  }
+
   function pushConsentUpdate(state) {
     if (typeof window.gtag !== "function") {
       window.dataLayer = window.dataLayer || [];
@@ -42,6 +49,7 @@
         event: "consent_decision",
         consent_state: state,
       });
+      pushUetConsent(state);
       return;
     }
     var payload = state === GRANTED
@@ -63,6 +71,7 @@
       event: "consent_decision",
       consent_state: state,
     });
+    pushUetConsent(state);
   }
 
   function hide(banner) {

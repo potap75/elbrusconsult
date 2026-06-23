@@ -67,6 +67,7 @@ def test_homepage_emits_all_security_headers():
     assert "connect.facebook.net" in csp
     assert "snap.licdn.com" in csp
     assert "bat.bing.com" in csp
+    assert "bat.bing.net" in csp
     assert "analytics.tiktok.com" in csp
     # Google Fonts (Inter + Sora display face on the home page) is loaded from
     # fonts.googleapis.com (CSS) + fonts.gstatic.com (woff2). Both endpoints
