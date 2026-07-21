@@ -21,6 +21,7 @@ class StaticViewSitemap(Sitemap):
             "home",
             "about",
             "privacy",
+            "terms",
             "services-list",
             "blog-list",
             "contact",

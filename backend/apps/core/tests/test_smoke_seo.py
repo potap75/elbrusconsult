@@ -13,6 +13,7 @@ PUBLIC_ROUTES_BY_NAME = [
     "home",
     "about",
     "privacy",
+    "terms",
     "services-list",
     "blog-list",
     "contact",
@@ -65,7 +66,7 @@ def test_sitemap_lists_static_and_dynamic_urls(seeded_db):
     body = response.content.decode("utf-8")
 
     # Static views
-    for path in ["/", "/about/", "/privacy/", "/services/", "/blog/", "/contact/", "/newsletter/", "/schedule/"]:
+    for path in ["/", "/about/", "/privacy/", "/terms/", "/services/", "/blog/", "/contact/", "/newsletter/", "/schedule/"]:
         assert path in body, f"sitemap missing static path {path}"
 
     # At least one service detail and the sample blog post
@@ -163,6 +164,24 @@ def test_privacy_page_renders_and_is_in_sitemap():
 
     sitemap = client.get("/sitemap.xml")
     assert "/privacy/" in sitemap.content.decode("utf-8")
+
+
+@pytest.mark.django_db
+def test_terms_page_renders_and_is_linked_from_footer():
+    client = Client()
+    response = client.get(reverse("terms"))
+    assert response.status_code == 200
+    body = response.content.decode("utf-8")
+    assert 'id="terms"' in body
+    assert "Terms of Service" in body
+
+    # Footer on every page links to both legal pages.
+    home = client.get(reverse("home")).content.decode("utf-8")
+    assert 'href="/terms/"' in home
+    assert 'href="/privacy/"' in home
+
+    sitemap = client.get("/sitemap.xml")
+    assert "/terms/" in sitemap.content.decode("utf-8")
 
 
 @pytest.mark.django_db

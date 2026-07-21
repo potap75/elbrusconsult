@@ -73,6 +73,26 @@ class PrivacyView(SeoMixin, TemplateView):
         return context
 
 
+class TermsView(SeoMixin, TemplateView):
+    template_name = "pages/terms.html"
+    seo_title = "Terms of Service"
+    seo_description = (
+        "The terms that govern use of elbruscloud.com and engagement of "
+        "Elbrus Cloud consulting services, including the advisory phone line."
+    )
+
+    def get_breadcrumbs(self) -> list[dict[str, str]]:
+        return [
+            {"name": "Home", "url": "/"},
+            {"name": "Terms of Service", "url": "/terms/"},
+        ]
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["breadcrumb_schema"] = breadcrumb_schema(self.get_breadcrumbs())
+        return context
+
+
 class ServiceListView(SeoMixin, ListView):
     template_name = "pages/service_list.html"
     model = Service

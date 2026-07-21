@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% include "partials/_page_hero.html" with hero_eyebrow="Legal" hero_heading="Terms of service" hero_lead="The terms that govern your use of this website and any consulting services you engage us for." hero_size="md" %}
+
+  <section class="relative isolate overflow-hidden bg-slate-50">
+    <div class="topographic-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+      <article id="terms" class="prose prose-slate max-w-none" data-reveal="card">
+        <p class="lead">
+          These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of
+          <a href="{{ SITE_URL }}">{{ SITE_DOMAIN }}</a> (the &ldquo;Site&rdquo;), operated by
+          {{ SITE_NAME }} (&ldquo;we&rdquo;, &ldquo;us&rdquo;). By using the Site, booking a
+          consultation, or calling our advisory line, you agree to these Terms.
+        </p>
+        <p><em>Last updated: {% now "F j, Y" %}.</em></p>
+
+        <h2>Use of the Site</h2>
+        <p>
+          You may use the Site for lawful purposes only. You agree not to interfere with the
+          Site&rsquo;s operation, probe or test its security other than through a written
+          engagement with us, scrape content in bulk, or submit false or misleading information
+          through our forms.
+        </p>
+
+        <h2>Informational content, not professional advice</h2>
+        <p>
+          Content on the Site &mdash; including blog posts, service descriptions, and resources
+          &mdash; is provided for general information. It is not a substitute for tailored
+          professional advice about your specific environment, and reading it does not create a
+          consulting engagement between you and {{ SITE_NAME }}.
+        </p>
+
+        <h2>Consulting services</h2>
+        <p>
+          Consulting engagements are governed by a separate written agreement (such as a proposal,
+          statement of work, or master services agreement) signed by both parties. If a written
+          agreement conflicts with these Terms, the written agreement controls for that engagement.
+          Scheduling a call through the Site does not by itself create an engagement.
+        </p>
+
+        <h2>Advisory phone line</h2>
+        <p>
+          Our advisory phone line is a paid service billed at the rate stated on the Site or quoted
+          at the start of the call. Advice given on a call is based on the information you provide
+          during the call and is offered without warranty. For work that requires review of your
+          systems or documentation, we will recommend a formal engagement.
+        </p>
+
+        <h2>Bookings and cancellations</h2>
+        <p>
+          When you book a consultation through the Site you agree to provide accurate contact
+          details. You may reschedule or cancel using the link in your confirmation email. We may
+          cancel or reschedule a booking if needed and will notify you at the email you provided.
+        </p>
+
+        <h2>Intellectual property</h2>
+        <p>
+          The Site and its content (text, graphics, logos, and design) are owned by
+          {{ SITE_NAME }} or its licensors and are protected by copyright and trademark laws. You
+          may not reproduce or redistribute Site content without our prior written permission,
+          except for brief quotations with attribution.
+        </p>
+
+        <h2>Third-party links and services</h2>
+        <p>
+          The Site may link to third-party websites or rely on third-party services (for example,
+          analytics or scheduling providers). We are not responsible for the content or practices
+          of third parties. Your use of third-party services is governed by their own terms.
+        </p>
+
+        <h2>Disclaimer of warranties</h2>
+        <p>
+          The Site is provided &ldquo;as is&rdquo; and &ldquo;as available&rdquo; without
+          warranties of any kind, express or implied, including merchantability, fitness for a
+          particular purpose, and non-infringement. We do not warrant that the Site will be
+          uninterrupted, error-free, or free of harmful components.
+        </p>
+
+        <h2>Limitation of liability</h2>
+        <p>
+          To the maximum extent permitted by law, {{ SITE_NAME }} will not be liable for any
+          indirect, incidental, special, consequential, or punitive damages, or any loss of
+          profits, revenue, data, or business opportunity, arising out of or related to your use
+          of the Site. Our total liability for claims relating to the Site will not exceed one
+          hundred US dollars (US $100). Liability arising from a signed consulting agreement is
+          governed by that agreement.
+        </p>
+
+        <h2>Indemnification</h2>
+        <p>
+          You agree to indemnify and hold {{ SITE_NAME }} harmless from claims, damages, and
+          expenses (including reasonable attorneys&rsquo; fees) arising from your misuse of the
+          Site or violation of these Terms.
+        </p>
+
+        <h2>Privacy</h2>
+        <p>
+          Our collection and use of personal information is described in our
+          <a href="{% url 'privacy' %}">Privacy and cookie notice</a>.
+        </p>
+
+        <h2>Governing law</h2>
+        <p>
+          These Terms are governed by the laws of the State of North Carolina, USA, without regard
+          to conflict-of-law principles. Any dispute arising from these Terms or the Site will be
+          resolved in the state or federal courts located in North Carolina, and you consent to
+          their jurisdiction.
+        </p>
+
+        <h2>Changes to these Terms</h2>
+        <p>
+          We may update these Terms from time to time. Material changes will be reflected on this
+          page with a revised &ldquo;Last updated&rdquo; date. Continued use of the Site after a
+          change constitutes acceptance of the updated Terms.
+        </p>
+
+        <h2>Contact</h2>
+        <p>
+          Questions about these Terms? Email
+          <a href="mailto:{{ INFO_EMAIL }}">{{ INFO_EMAIL }}</a> or use our
+          <a href="{% url 'contact' %}">contact form</a>.
+        </p>
+      </article>
+    </div>
+  </section>
+{% endblock %}
