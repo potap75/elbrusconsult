@@ -42,6 +42,10 @@ MemoryDenyWriteExecute=true
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged @resources @mount @debug @cpu-emulation @obsolete
+# Gunicorn chown()s the unix socket it binds (unlike gunicorn.service, which
+# receives a pre-created socket FD from gunicorn.socket). @privileged includes
+# @chown, so re-allow it or the master dies with SIGSYS at startup.
+SystemCallFilter=@chown
 CapabilityBoundingSet=
 AmbientCapabilities=
 UMask=0027

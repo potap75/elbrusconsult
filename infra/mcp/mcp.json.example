@@ -12,7 +12,7 @@
     "elbrus-ads-engine": {
       "url": "https://mcp.elbruscloud.com/mcp",
       "headers": {
-        "Authorization": "Bearer <ENGINE_BEARER_TOKEN>"
+        "Authorization": "Bearer <ENGINE_BEARER_TOKEN_FROM_KV_kv-elbruscloud>"
       }
     }
   }

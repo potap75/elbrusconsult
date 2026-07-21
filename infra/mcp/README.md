@@ -50,19 +50,21 @@ Tools (all Google Ads mutations default to `dry_run=true` = API
 4. **Secrets file** `/opt/elbrus/adengine.env` (mode 600, `elbrus:elbrus`):
 
    ```bash
-   # on a machine with az login (values from Key Vault; see inventory below)
+   # on a machine with `az login` against the `romanconsulting` subscription
    ssh <vm> 'sudo -u elbrus tee /opt/elbrus/adengine.env >/dev/null && sudo chmod 600 /opt/elbrus/adengine.env' <<EOF
-   ENGINE_BEARER_TOKEN=$(az keyvault secret show --vault-name <KV> --name adengine-bearer-token --query value -o tsv)
-   GADS_DEVELOPER_TOKEN=$(az keyvault secret show --vault-name <KV> --name google-ads-developer-token --query value -o tsv)
-   GADS_CLIENT_ID=$(az keyvault secret show --vault-name <KV> --name google-ads-oauth-client-id --query value -o tsv)
-   GADS_CLIENT_SECRET=$(az keyvault secret show --vault-name <KV> --name google-ads-oauth-client-secret --query value -o tsv)
-   GADS_REFRESH_TOKEN=$(az keyvault secret show --vault-name <KV> --name google-ads-oauth-refresh-token --query value -o tsv)
+   ENGINE_BEARER_TOKEN=$(az keyvault secret show --vault-name kv-elbruscloud --name adengine-bearer-token --query value -o tsv)
+   GADS_DEVELOPER_TOKEN=$(az keyvault secret show --vault-name kv-elbruscloud --name google-ads-developer-token --query value -o tsv)
+   GADS_CLIENT_ID=$(az keyvault secret show --vault-name kv-elbruscloud --name google-ads-oauth-client-id --query value -o tsv)
+   GADS_CLIENT_SECRET=$(az keyvault secret show --vault-name kv-elbruscloud --name google-ads-oauth-client-secret --query value -o tsv)
+   GADS_REFRESH_TOKEN=$(az keyvault secret show --vault-name kv-elbruscloud --name google-ads-oauth-refresh-token --query value -o tsv)
    GOOGLE_APPLICATION_CREDENTIALS=/opt/elbrus/secrets/ga-service-account.json
    EOF
    ```
 
-   Generate the bearer token once with `openssl rand -hex 32` and store it in
-   Key Vault as `adengine-bearer-token`.
+   The bearer token has already been generated (`openssl rand -hex 32`) and is
+   stored in Key Vault `kv-elbruscloud` (subscription `romanconsulting`,
+   resource group `rg-elbruscloud`) as secret `adengine-bearer-token`. To
+   rotate it, regenerate and overwrite that secret, then redo step 4 and 6.
 
 5. **Service-account key** to `/opt/elbrus/secrets/ga-service-account.json`
    (mode 600, `elbrus:elbrus`), downloaded from Key Vault secret
@@ -99,9 +101,12 @@ Tools (all Google Ads mutations default to `dry_run=true` = API
 
 ## Key Vault secrets inventory
 
+Vault: `kv-elbruscloud` (subscription `romanconsulting`, resource group
+`rg-elbruscloud`).
+
 | Secret name | Purpose |
 | --- | --- |
-| `adengine-bearer-token` | Cursor -> engine auth token |
+| `adengine-bearer-token` | Cursor -> engine auth token (generated and stored; not yet deployed to the VM) |
 | `mcp-google-service-account-json` | GA4 + GSC service-account key |
 | `google-ads-developer-token` | Google Ads API dev token |
 | `google-ads-oauth-client-id` / `-client-secret` / `-refresh-token` | Google Ads OAuth |
