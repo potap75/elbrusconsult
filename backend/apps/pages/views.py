@@ -93,6 +93,34 @@ class TermsView(SeoMixin, TemplateView):
         return context
 
 
+class AdsEngineView(SeoMixin, TemplateView):
+    """Public description page for the 'elbruscloud' OAuth application.
+
+    Google OAuth app verification requires the app's home page URL to
+    describe the application, explain why it requests Google user data,
+    and link to the privacy policy. This page is what we submit as the
+    Application home page on the OAuth consent screen.
+    """
+
+    template_name = "pages/ads_engine.html"
+    seo_title = "Elbrus Ads Engine - Internal Ad-Management Application"
+    seo_description = (
+        "What the Elbrus Ads Engine application does, which Google data it "
+        "accesses via the Google Ads API, and how that data is protected."
+    )
+
+    def get_breadcrumbs(self) -> list[dict[str, str]]:
+        return [
+            {"name": "Home", "url": "/"},
+            {"name": "Ads Engine", "url": "/ads-engine/"},
+        ]
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["breadcrumb_schema"] = breadcrumb_schema(self.get_breadcrumbs())
+        return context
+
+
 class ServiceListView(SeoMixin, ListView):
     template_name = "pages/service_list.html"
     model = Service

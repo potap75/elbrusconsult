@@ -20,6 +20,7 @@ class StaticViewSitemap(Sitemap):
         return [
             "home",
             "about",
+            "ads-engine",
             "privacy",
             "terms",
             "services-list",

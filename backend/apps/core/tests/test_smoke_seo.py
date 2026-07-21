@@ -12,6 +12,7 @@ from django.urls import reverse
 PUBLIC_ROUTES_BY_NAME = [
     "home",
     "about",
+    "ads-engine",
     "privacy",
     "terms",
     "services-list",
@@ -66,7 +67,7 @@ def test_sitemap_lists_static_and_dynamic_urls(seeded_db):
     body = response.content.decode("utf-8")
 
     # Static views
-    for path in ["/", "/about/", "/privacy/", "/terms/", "/services/", "/blog/", "/contact/", "/newsletter/", "/schedule/"]:
+    for path in ["/", "/about/", "/ads-engine/", "/privacy/", "/terms/", "/services/", "/blog/", "/contact/", "/newsletter/", "/schedule/"]:
         assert path in body, f"sitemap missing static path {path}"
 
     # At least one service detail and the sample blog post
@@ -182,6 +183,21 @@ def test_terms_page_renders_and_is_linked_from_footer():
 
     sitemap = client.get("/sitemap.xml")
     assert "/terms/" in sitemap.content.decode("utf-8")
+
+
+@pytest.mark.django_db
+def test_ads_engine_page_meets_oauth_homepage_requirements():
+    """Google OAuth verification requires the app home page to describe the
+    app, explain the Google data it requests, and link to the privacy policy,
+    all without requiring login."""
+    client = Client()
+    response = client.get(reverse("ads-engine"))
+    assert response.status_code == 200
+    body = response.content.decode("utf-8")
+    assert "Elbrus Ads Engine" in body
+    assert "auth/adwords" in body
+    assert 'href="/privacy/"' in body
+    assert "Limited Use" in body
 
 
 @pytest.mark.django_db
