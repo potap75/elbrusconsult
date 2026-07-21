@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "buffer": {
+      "url": "https://mcp.buffer.com/mcp",
+      "headers": {
+        "Authorization": "Bearer <YOUR_EXISTING_BUFFER_TOKEN>"
+      }
+    },
+    "meta-ads": {
+      "url": "https://mcp.facebook.com/ads"
+    },
+    "elbrus-ads-engine": {
+      "url": "https://mcp.elbruscloud.com/mcp",
+      "headers": {
+        "Authorization": "Bearer <ENGINE_BEARER_TOKEN>"
+      }
+    }
+  }
+}

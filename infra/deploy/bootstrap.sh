@@ -86,21 +86,52 @@ sudo -u elbrus bash -lc "cd '${APP_DIR}/backend' && \
     DJANGO_SETTINGS_MODULE=elbrus.settings.prod '${VENV_DIR}/bin/python' manage.py collectstatic --noinput"
 
 # -------------------------------------------------------------------------
+log "Setting up ads engine (remote MCP) virtualenv..."
+ADENGINE_VENV="${APP_ROOT}/adengine-venv"
+if [ ! -d "${ADENGINE_VENV}" ]; then
+    sudo -u elbrus python3 -m venv "${ADENGINE_VENV}"
+fi
+sudo -u elbrus "${ADENGINE_VENV}/bin/pip" install --upgrade pip wheel
+sudo -u elbrus "${ADENGINE_VENV}/bin/pip" install -r "${APP_DIR}/adengine/requirements.txt"
+
+if [ ! -f "${APP_ROOT}/adengine.env" ]; then
+    log "WARNING: ${APP_ROOT}/adengine.env is missing. The ads engine will"
+    log "         start but reject requests (503). See infra/mcp/README.md."
+fi
+
+# -------------------------------------------------------------------------
 log "Installing systemd units..."
 sudo install -m 0644 "${APP_DIR}/infra/systemd/gunicorn.service" /etc/systemd/system/gunicorn.service
 sudo install -m 0644 "${APP_DIR}/infra/systemd/gunicorn.socket"  /etc/systemd/system/gunicorn.socket
+sudo install -m 0644 "${APP_DIR}/infra/systemd/adengine.service" /etc/systemd/system/adengine.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now gunicorn.socket
 sudo systemctl restart gunicorn.service
+sudo systemctl enable adengine.service
+sudo systemctl restart adengine.service
 
 # -------------------------------------------------------------------------
 log "Installing nginx site..."
 sudo install -m 0644 "${APP_DIR}/infra/nginx/elbrus.conf" /etc/nginx/sites-available/elbrus.conf
 sudo ln -sf /etc/nginx/sites-available/elbrus.conf /etc/nginx/sites-enabled/elbrus.conf
 sudo rm -f /etc/nginx/sites-enabled/default
+
+# The ads engine HTTPS block references its TLS cert, so it is only enabled
+# once certbot has issued one (the elbrus.conf :80 block already serves the
+# ACME challenge for mcp.elbruscloud.com, so issuance works either way).
+sudo install -m 0644 "${APP_DIR}/infra/nginx/adengine.conf" /etc/nginx/sites-available/adengine.conf
+if [ -f /etc/letsencrypt/live/mcp.elbruscloud.com/fullchain.pem ]; then
+    sudo ln -sf /etc/nginx/sites-available/adengine.conf /etc/nginx/sites-enabled/adengine.conf
+else
+    log "NOTE: mcp.elbruscloud.com cert not found; adengine nginx site staged"
+    log "      but not enabled. Run: sudo certbot --nginx -d mcp.elbruscloud.com"
+    sudo rm -f /etc/nginx/sites-enabled/adengine.conf
+fi
+
 sudo nginx -t
 sudo systemctl reload nginx
 
 log "Bootstrap complete."
 log "Next steps: point DNS at this VM, then run:"
 log "  sudo certbot --nginx -d elbruscloud.com -d www.elbruscloud.com"
+log "  sudo certbot --nginx -d mcp.elbruscloud.com   # ads engine endpoint"

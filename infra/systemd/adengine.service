@@ -1,0 +1,48 @@
+[Unit]
+Description=Elbrus ads engine (remote MCP server)
+After=network.target
+
+[Service]
+User=elbrus
+Group=elbrus
+RuntimeDirectory=elbrus
+RuntimeDirectoryPreserve=yes
+WorkingDirectory=/opt/elbrus/app
+EnvironmentFile=/opt/elbrus/adengine.env
+# Gunicorn + UvicornWorker (ASGI), matching the site's gunicorn conventions.
+# --umask 0117 makes the unix socket 0660 elbrus:elbrus so nginx (www-data,
+# member of the elbrus group) can connect - same permissions as gunicorn.sock.
+ExecStart=/opt/elbrus/adengine-venv/bin/gunicorn adengine.server:app \
+          --worker-class uvicorn.workers.UvicornWorker \
+          --workers 1 \
+          --bind unix:/run/elbrus/adengine.sock \
+          --umask 0117 \
+          --access-logfile - \
+          --error-logfile - \
+          --timeout 120
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+Restart=on-failure
+RestartSec=5
+
+# --- Sandbox / hardening ----------------------------------------------------
+# Namespace-based directives (PrivateTmp, ProtectSystem, ...) are intentionally
+# omitted for the same reason as gunicorn.service: Azure B-series VMs restrict
+# the required kernel namespace features for non-root services, which causes
+# status=226/NAMESPACE at startup. The directives below harden without them.
+NoNewPrivileges=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources @mount @debug @cpu-emulation @obsolete
+CapabilityBoundingSet=
+AmbientCapabilities=
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target
