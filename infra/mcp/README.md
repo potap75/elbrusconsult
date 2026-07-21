@@ -1,112 +1,120 @@
-# Direct ad-platform MCP setup (Cursor)
+# Ad-platform connections for Cursor
 
-This replaces the retired Ryze MCP with direct, per-platform connections:
+Location-agnostic setup: everything is a remote HTTPS MCP server, so any
+Cursor install works with just [`mcp.json.example`](mcp.json.example) merged
+into `~/.cursor/mcp.json`.
 
-| Platform | How | Access |
-| --- | --- | --- |
-| Meta Ads | Official hosted MCP `https://mcp.facebook.com/ads` | Read + write (creates default to PAUSED) |
-| GA4 | Official `analytics-mcp` (pipx) | Read-only |
-| Search Console | Community `mcp-server-gsc` (npx), same service account | Read + sitemap submit |
-| Google Ads | Official `google-ads-mcp` (read-only) + `scripts/gads/` write CLI in this repo | Read via MCP, write via CLI |
-| LinkedIn Ads | Marketing API scripts after Marketing Developer Platform approval | Pending approval |
+| Server | Endpoint | Covers | Access |
+| --- | --- | --- | --- |
+| `buffer` | `mcp.buffer.com/mcp` (unchanged) | Organic social posting | Read + write |
+| `meta-ads` | `mcp.facebook.com/ads` (Meta-hosted, OAuth) | Meta Ads | Read + write (creates default PAUSED) |
+| `elbrus-ads-engine` | `mcp.elbruscloud.com/mcp` (our Azure VM) | Google Ads (read + guarded writes), GA4, Search Console | Bearer token |
 
-The target client config lives in [`mcp.json.example`](mcp.json.example). Merge it
-into `~/.cursor/mcp.json` on the local machine (PowerShell/macOS paths differ —
-the example uses the macOS path). **Keep the existing `buffer` entry as is**;
-only the `ryze-ads` entry is removed.
+LinkedIn Ads is pending Marketing Developer Platform approval (apply at
+`https://developer.linkedin.com/`, scopes `r_ads`, `rw_ads`,
+`r_ads_reporting`; ~1-4 weeks). Until then use Campaign Manager.
 
 ---
 
-## 1. Meta Ads (same day, ~10 min)
+## The ads engine (`adengine/`)
 
-1. Add the `meta-ads` entry from the example config. No token needed — Cursor
-   runs Meta's OAuth flow in the browser on first connect.
-2. Sign in with the account that administers Business Manager
-   **2756765971296445** and grant ads scopes.
-3. Smoke test in Cursor: call `ads_get_ad_accounts` and confirm the elbruscloud
-   ad account is listed.
+FastMCP server deployed on the **elbrus-app VM** by
+[`infra/deploy/bootstrap.sh`](../deploy/bootstrap.sh):
 
-Notes:
-- The server is in open beta; tool names may change between versions.
-- Campaign creation defaults to **PAUSED** — review in Ads Manager before enabling.
+- systemd unit [`infra/systemd/adengine.service`](../systemd/adengine.service)
+  (gunicorn + UvicornWorker, unix socket `/run/elbrus/adengine.sock`, user
+  `elbrus`, venv `/opt/elbrus/adengine-venv`).
+- nginx site [`infra/nginx/adengine.conf`](../nginx/adengine.conf) at
+  `mcp.elbruscloud.com` (staged on every deploy; enabled once the TLS cert
+  exists).
+- Bearer-token auth enforced in the app (`ENGINE_BEARER_TOKEN`); unauthorized
+  requests get 401, unconfigured engine fails closed with 503. `/healthz` is
+  public.
 
-## 2. Google Cloud service account (GA4 + GSC, ~30 min)
+Tools (all Google Ads mutations default to `dry_run=true` = API
+`validate_only`; pass `dry_run=false` to apply; new RSAs are always PAUSED):
 
-```bash
-PROJECT_ID=elbrus-marketing            # or reuse an existing project
-SA_NAME=elbrus-mcp
-gcloud projects create "$PROJECT_ID" 2>/dev/null || true
-gcloud config set project "$PROJECT_ID"
-gcloud services enable analyticsadmin.googleapis.com \
-                       analyticsdata.googleapis.com \
-                       searchconsole.googleapis.com
-gcloud iam service-accounts create "$SA_NAME" --display-name "Elbrus MCP (Cursor)"
-gcloud iam service-accounts keys create ~/.config/elbrus/ga-service-account.json \
-  --iam-account "$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com"
-```
+- `gads_gaql`, `gads_pause_campaign`, `gads_enable_campaign`,
+  `gads_set_budget`, `gads_add_keywords`, `gads_create_rsa`
+- `ga4_account_summaries`, `ga4_run_report`, `ga4_realtime`
+- `gsc_list_sites`, `gsc_search_analytics`, `gsc_submit_sitemap`
 
-Then grant the service account email
-(`elbrus-mcp@<PROJECT_ID>.iam.gserviceaccount.com`) access in each product UI:
+### One-time VM setup
 
-- **GA4**: Admin -> Property (`elbruscloud`, measurement ID `G-JD3TKNY687`) ->
-  Property access management -> add the SA email as **Viewer**.
-- **Search Console**: `https://search.google.com/search-console` ->
-  `elbruscloud.com` property -> Settings -> Users and permissions -> add the SA
-  email as **Full** user.
-
-Back up the key to Key Vault (never commit it):
-
-```bash
-az keyvault secret set --vault-name <SECUGENT_KV_NAME> \
-  --name mcp-google-service-account-json \
-  --file ~/.config/elbrus/ga-service-account.json
-```
-
-Add the `analytics-mcp` and `gsc-mcp` entries from the example config
-(requires `pipx` and Node/`npx` locally). Smoke test: `get_account_summaries`
-should list the elbruscloud property; `list_sites` should list
-`sc-domain:elbruscloud.com`.
-
-## 3. Google Ads (days — waits on token approval)
-
-1. In the **elbruscloud Google Ads account**: Tools & settings -> Setup ->
-   **API Center** -> apply for a developer token (Basic access). Approval is
-   typically 1-3 business days.
-2. Store it:
+1. **DNS**: add an A record `mcp.elbruscloud.com` -> the elbrus-app VM public IP.
+2. **Deploy**: push to `main` (CI runs `elbrus-bootstrap`) or run
+   `sudo /usr/local/sbin/elbrus-bootstrap` on the VM.
+3. **TLS**: `sudo certbot --nginx -d mcp.elbruscloud.com`, then re-run the
+   bootstrap (or `sudo ln -sf /etc/nginx/sites-available/adengine.conf
+   /etc/nginx/sites-enabled/ && sudo nginx -t && sudo systemctl reload nginx`).
+4. **Secrets file** `/opt/elbrus/adengine.env` (mode 600, `elbrus:elbrus`):
 
    ```bash
-   az keyvault secret set --vault-name <SECUGENT_KV_NAME> \
-     --name google-ads-developer-token --value <TOKEN>
+   # on a machine with az login (values from Key Vault; see inventory below)
+   ssh <vm> 'sudo -u elbrus tee /opt/elbrus/adengine.env >/dev/null && sudo chmod 600 /opt/elbrus/adengine.env' <<EOF
+   ENGINE_BEARER_TOKEN=$(az keyvault secret show --vault-name <KV> --name adengine-bearer-token --query value -o tsv)
+   GADS_DEVELOPER_TOKEN=$(az keyvault secret show --vault-name <KV> --name google-ads-developer-token --query value -o tsv)
+   GADS_CLIENT_ID=$(az keyvault secret show --vault-name <KV> --name google-ads-oauth-client-id --query value -o tsv)
+   GADS_CLIENT_SECRET=$(az keyvault secret show --vault-name <KV> --name google-ads-oauth-client-secret --query value -o tsv)
+   GADS_REFRESH_TOKEN=$(az keyvault secret show --vault-name <KV> --name google-ads-oauth-refresh-token --query value -o tsv)
+   GOOGLE_APPLICATION_CREDENTIALS=/opt/elbrus/secrets/ga-service-account.json
+   EOF
    ```
 
-3. Add the `google-ads-mcp` entry from the example config (read-only:
-   `list_accessible_customers`, GAQL `search`, resource metadata).
-4. For **writes** (pause/enable, budgets, keywords, RSAs) use the CLI in
-   [`scripts/gads/`](../../scripts/gads/README.md) — the official MCP is
-   read-only by design.
+   Generate the bearer token once with `openssl rand -hex 32` and store it in
+   Key Vault as `adengine-bearer-token`.
 
-Note on auth: the official server supports OAuth user credentials or a service
-account. A service account requires a Google Workspace domain-delegation setup;
-the simpler path is OAuth desktop credentials (`gcloud auth application-default login`)
-with the Google account that has access to the Ads account.
+5. **Service-account key** to `/opt/elbrus/secrets/ga-service-account.json`
+   (mode 600, `elbrus:elbrus`), downloaded from Key Vault secret
+   `mcp-google-service-account-json`.
+6. `sudo systemctl restart adengine.service`, then verify:
+   `curl https://mcp.elbruscloud.com/healthz` -> `ok`.
 
-## 4. LinkedIn Ads (weeks — start the application now)
+### Google credential prerequisites
 
-1. Apply at `https://developer.linkedin.com/` -> create an app tied to the
-   Elbrus Cloud company page -> request **Marketing Developer Platform** access
-   (`r_ads`, `rw_ads`, `r_ads_reporting` scopes). Approval takes ~1-4 weeks.
-2. Until approved, manage campaigns in Campaign Manager UI. The Insight Tag
-   (partner ID 9255234) is independent of this and keeps working.
-3. On approval: store the OAuth client ID/secret + refresh token in Key Vault
-   (`linkedin-ads-client-id`, `linkedin-ads-client-secret`,
-   `linkedin-ads-refresh-token`) and wire either a community LinkedIn MCP or
-   thin scripts alongside `scripts/gads/`.
+- **GCP service account** (GA4 + GSC): create a project, enable
+  `analyticsadmin.googleapis.com`, `analyticsdata.googleapis.com`,
+  `searchconsole.googleapis.com`; create the SA + key; upload the key JSON to
+  Key Vault (`mcp-google-service-account-json`). Grant the SA email:
+  - GA4: Property access management on the elbruscloud property
+    (`G-JD3TKNY687`) as **Viewer**.
+  - Search Console: Users and permissions on `elbruscloud.com` as **Full**.
+- **Google Ads developer token**: Google Ads UI -> API Center -> apply for
+  Basic access (1-3 business days). Store as `google-ads-developer-token`.
+- **Google Ads OAuth**: create a Desktop-app OAuth client in the GCP project;
+  mint a refresh token (`python -m google.ads.googleads.oauth2 --client_id ...
+  --client_secret ... --scopes https://www.googleapis.com/auth/adwords`)
+  signing in as the Google account with access to the Ads account. Store all
+  three values in Key Vault.
 
-## Secrets inventory (Azure Key Vault)
+### Ops
+
+- Logs: `journalctl -u adengine -f`
+- Restart after env changes: `sudo systemctl restart adengine.service`
+- Rotate the bearer token: update Key Vault + `/opt/elbrus/adengine.env`,
+  restart the service, update `~/.cursor/mcp.json` on your machines.
+- If Cursor reports 421 errors, the Host allow-list needs updating:
+  set `ENGINE_ALLOWED_HOSTS` in `adengine.env` (comma-separated; defaults
+  include `mcp.elbruscloud.com`).
+
+## Key Vault secrets inventory
 
 | Secret name | Purpose |
 | --- | --- |
-| `mcp-google-service-account-json` | GA4 + GSC service-account key (backup) |
+| `adengine-bearer-token` | Cursor -> engine auth token |
+| `mcp-google-service-account-json` | GA4 + GSC service-account key |
 | `google-ads-developer-token` | Google Ads API dev token |
-| `google-ads-oauth-refresh-token` | Google Ads write CLI OAuth refresh token |
+| `google-ads-oauth-client-id` / `-client-secret` / `-refresh-token` | Google Ads OAuth |
 | `linkedin-ads-client-id` / `-client-secret` / `-refresh-token` | LinkedIn Marketing API (after MDP approval) |
+
+## Local development
+
+```bash
+pip install -r adengine/requirements.txt
+ENGINE_BEARER_TOKEN=dev uvicorn adengine.server:app --port 8765
+curl http://127.0.0.1:8765/healthz
+pytest adengine/tests
+```
+
+The `scripts/gads/` CLI remains available as a local/manual alternative for
+Google Ads writes; the engine's `gads_*` tools are ports of the same logic.

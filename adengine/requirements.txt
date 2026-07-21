@@ -1,0 +1,7 @@
+mcp>=1.28,<2
+uvicorn>=0.30
+gunicorn>=22.0
+google-ads>=25.0.0
+google-analytics-data>=0.18
+google-analytics-admin>=0.22
+google-api-python-client>=2.100
