@@ -8,7 +8,9 @@ Group=elbrus
 RuntimeDirectory=elbrus
 RuntimeDirectoryPreserve=yes
 WorkingDirectory=/opt/elbrus/app
-EnvironmentFile=/opt/elbrus/adengine.env
+# Optional ("-"): without it the engine still starts and fails closed (503)
+# on every request, which is the documented pre-secrets state.
+EnvironmentFile=-/opt/elbrus/adengine.env
 # Gunicorn + UvicornWorker (ASGI), matching the site's gunicorn conventions.
 # --umask 0117 makes the unix socket 0660 elbrus:elbrus so nginx (www-data,
 # member of the elbrus group) can connect - same permissions as gunicorn.sock.
