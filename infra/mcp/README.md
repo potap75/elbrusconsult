@@ -36,6 +36,8 @@ Tools (all Google Ads mutations default to `dry_run=true` = API
 
 - `gads_gaql`, `gads_pause_campaign`, `gads_enable_campaign`,
   `gads_set_budget`, `gads_add_keywords`, `gads_create_rsa`
+  (customer IDs: `3783454052` = Elbrus Cloud client account with the
+  campaigns; `6539012537` = elbruscloud manager/MCC account)
 - `ga4_account_summaries`, `ga4_run_report`, `ga4_realtime`
 - `gsc_list_sites`, `gsc_search_analytics`, `gsc_submit_sitemap`
 
