@@ -124,7 +124,8 @@ SCHEDULING_SLOT_GRANULARITY_MINUTES = env.int(
 # Application definition
 # ----------------------------------------------------------------------------
 DJANGO_APPS = [
-    "django.contrib.admin",
+    # Custom AdminConfig: branded ElbrusAdminSite with a dashboard index.
+    "core.apps.ElbrusAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",

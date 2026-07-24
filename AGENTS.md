@@ -356,6 +356,8 @@ start.
 
 ## Conventions for agents working in this repo
 
+- **Testing environments:** only test in local Docker environment. Never run
+local VMs outside of Docker for any purposes including testing.
 - **Shell:** the local dev machine runs **Windows 11 + PowerShell**. Always
 use PowerShell syntax for local commands (`Set-Location`, `Copy-Item`,
 `\` path separators, `Activate.ps1`, etc.). Bash/sh is only appropriate

@@ -1,0 +1,55 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+<style>
+  /* Stock dashboard.css pins #content to 600px; let the panel grid breathe. */
+  .dashboard #content {
+    width: auto;
+  }
+  #elbrus-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  #elbrus-dashboard .module {
+    margin-bottom: 0;
+  }
+  #elbrus-dashboard table {
+    width: 100%;
+  }
+  #elbrus-dashboard td.elbrus-when {
+    text-align: right;
+    white-space: nowrap;
+    color: var(--body-quiet-color);
+    font-size: 0.6875rem;
+    vertical-align: top;
+  }
+</style>
+<div id="elbrus-dashboard">
+  {% for panel in dashboard_panels %}
+  <div class="module">
+    <table>
+      <caption>
+        <a href="{{ panel.changelist_url }}" class="section">
+          {{ panel.title }}
+          ({{ panel.count }}{% if panel.count_label %} {{ panel.count_label }}{% endif %})
+        </a>
+      </caption>
+      {% for row in panel.rows %}
+      <tr>
+        <th scope="row">
+          <a href="{{ row.url }}">{{ row.primary }}</a>
+          {% if row.secondary %}<br><span class="mini quiet">{{ row.secondary }}</span>{% endif %}
+        </th>
+        <td class="elbrus-when">{{ row.when|date:"M j, Y, H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td class="quiet">{{ panel.empty_label }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endfor %}
+</div>
+{{ block.super }}
+{% endblock %}
