@@ -131,15 +131,22 @@ _PERMISSIONS_POLICY = ", ".join(
 )
 
 
-def _build_csp(nonce: str) -> str:
+def _build_csp(nonce: str, *, strict_dynamic: bool = True) -> str:
     """Render the full Content-Security-Policy header for a given nonce.
 
     Built fresh on every request because the nonce changes; cheap enough
     (string join over fixed lists).
+
+    ``strict_dynamic=False`` is used on /admin/: 'strict-dynamic' makes
+    browsers ignore the 'self' host allowance, which blocks Django admin's
+    own static JS (theme.js, nav_sidebar.js) since those <script> tags
+    carry no nonce. The admin loads no third-party scripts, so plain
+    'self' + nonce is the right policy there.
     """
-    script_src = " ".join(
-        ("'self'", f"'nonce-{nonce}'", "'strict-dynamic'", *_SCRIPT_SRC_VENDORS)
-    )
+    script_parts = ["'self'", f"'nonce-{nonce}'"]
+    if strict_dynamic:
+        script_parts.append("'strict-dynamic'")
+    script_src = " ".join((*script_parts, *_SCRIPT_SRC_VENDORS))
     connect_src = " ".join(("'self'", *_CONNECT_SRC_VENDORS))
     img_src = " ".join(("'self'", "data:", *_IMG_SRC_VENDORS))
     frame_src = " ".join(("'self'", *_FRAME_SRC_VENDORS))
@@ -178,7 +185,11 @@ class SecurityHeadersMiddleware:
         # short enough to be cheap to repeat across many <script> tags.
         request.csp_nonce = secrets.token_urlsafe(16)
         response = self.get_response(request)
-        response.setdefault("Content-Security-Policy", _build_csp(request.csp_nonce))
+        strict_dynamic = not request.path.startswith("/admin/")
+        response.setdefault(
+            "Content-Security-Policy",
+            _build_csp(request.csp_nonce, strict_dynamic=strict_dynamic),
+        )
         response.setdefault("Permissions-Policy", _PERMISSIONS_POLICY)
         response.setdefault("Cross-Origin-Resource-Policy", "same-origin")
         return response

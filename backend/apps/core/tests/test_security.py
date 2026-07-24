@@ -80,6 +80,22 @@ def test_homepage_emits_all_security_headers():
 
 
 @pytest.mark.django_db
+def test_admin_csp_drops_strict_dynamic_but_public_pages_keep_it():
+    """'strict-dynamic' makes browsers ignore 'self', which would block the
+    Django admin's own static JS (theme.js, nav_sidebar.js) - those script
+    tags carry no nonce. The admin CSP must therefore omit it, while public
+    pages keep it for the GTM loader chain."""
+    client = Client()
+
+    public_csp = client.get(reverse("home")).headers["Content-Security-Policy"]
+    assert "'strict-dynamic'" in public_csp
+
+    admin_csp = client.get("/admin/login/").headers["Content-Security-Policy"]
+    assert "'strict-dynamic'" not in admin_csp
+    assert "script-src 'self' 'nonce-" in admin_csp
+
+
+@pytest.mark.django_db
 def test_csp_nonce_is_unique_per_request_and_threaded_into_template():
     """Two requests must produce two different nonces, and the nonce that
     ends up in the CSP header must match the one rendered into inline
