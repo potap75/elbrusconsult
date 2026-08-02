@@ -70,9 +70,17 @@ _SCRIPT_SRC_VENDORS = (
 
 _CONNECT_SRC_VENDORS = (
     "https://*.google-analytics.com",
+    # GA4 sends consented hits to the BARE apex analytics.google.com;
+    # the *.analytics.google.com wildcard does not match the apex, so it
+    # must be listed explicitly or consented conversion events are
+    # silently dropped by the browser.
+    "https://analytics.google.com",
     "https://*.analytics.google.com",
     "https://*.googletagmanager.com",
     "https://*.g.doubleclick.net",
+    # Google Ads conversion-linker fallbacks observed with consent granted.
+    "https://ad.doubleclick.net",
+    "https://www.google.com",
     "https://*.googleadservices.com",
     "https://px.ads.linkedin.com",
     "https://px4.ads.linkedin.com",
@@ -89,11 +97,15 @@ _CONNECT_SRC_VENDORS = (
 
 _IMG_SRC_VENDORS = (
     "https://*.google-analytics.com",
+    "https://analytics.google.com",
     "https://*.analytics.google.com",
     "https://*.googletagmanager.com",
     "https://*.g.doubleclick.net",
+    "https://ad.doubleclick.net",
     "https://*.googleadservices.com",
     "https://www.google.com",
+    # Microsoft UET cookie-sync pixel.
+    "https://c.bing.com",
     "https://www.google.co.uk",
     "https://px.ads.linkedin.com",
     "https://px4.ads.linkedin.com",

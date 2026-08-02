@@ -69,6 +69,13 @@ def test_homepage_emits_all_security_headers():
     assert "bat.bing.com" in csp
     assert "bat.bing.net" in csp
     assert "analytics.tiktok.com" in csp
+    # GA4 sends consented hits to the bare apex analytics.google.com, which
+    # the *.analytics.google.com wildcard does NOT cover. Regression test for
+    # conversion events being CSP-blocked after consent grant.
+    connect_src = csp[csp.index("connect-src") : csp.index(";", csp.index("connect-src"))]
+    assert " https://analytics.google.com" in connect_src
+    assert " https://www.google.com" in connect_src
+    assert " https://ad.doubleclick.net" in connect_src
     # Google Fonts (Inter + Sora display face on the home page) is loaded from
     # fonts.googleapis.com (CSS) + fonts.gstatic.com (woff2). Both endpoints
     # must be allow-listed or the typography silently falls back to system.
