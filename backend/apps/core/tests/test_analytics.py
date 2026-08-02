@@ -159,6 +159,27 @@ def test_bing_uet_loader_renders_with_consent_default():
 
 @pytest.mark.django_db
 @override_settings(GTM_CONTAINER_ID="GTM-TEST123")
+def test_stored_consent_grant_is_restored_before_gtm_loads():
+    """A returning visitor's consent grant must be re-applied inline in the
+    head, before the GTM loader. GTM processes queued dataLayer events (the
+    conversion pushes on thanks pages) at container init - earlier than the
+    DOMContentLoaded restore in consent.js - and the container's GA4 event
+    tags hard-block while analytics_storage is denied. Regression test for
+    the lost generate_lead / book_appointment conversions."""
+    client = Client()
+    response = client.get(reverse("home"))
+    body = response.content.decode("utf-8")
+
+    restore_idx = body.index('window.localStorage.getItem("elb_consent")')
+    gtm_loader_idx = body.index("googletagmanager.com/gtm.js")
+    assert restore_idx < gtm_loader_idx
+    restore_block = body[restore_idx : restore_idx + 400]
+    assert 'gtag("consent", "update"' in restore_block
+    assert "analytics_storage" in restore_block
+
+
+@pytest.mark.django_db
+@override_settings(GTM_CONTAINER_ID="GTM-TEST123")
 def test_contact_thanks_page_pushes_lead_conversion():
     """The contact form's thanks page must push a conversion event so GTM
     can map it to a Google Ads / LinkedIn / Meta conversion."""

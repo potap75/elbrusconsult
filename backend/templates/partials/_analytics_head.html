@@ -30,6 +30,22 @@
   });
   gtag("set", "ads_data_redaction", true);
   gtag("set", "url_passthrough", true);
+  {# Re-apply a stored consent grant BEFORE GTM initializes. GTM     #}
+  {# processes queued dataLayer events (e.g. the conversion pushes   #}
+  {# on thanks pages) at container init, which races ahead of the    #}
+  {# DOMContentLoaded restore in consent.js - and the container's    #}
+  {# GA4 event tags carry additional consent checks that hard-block  #}
+  {# (not cookieless-ping) while analytics_storage is denied.        #}
+  try {
+    if (window.localStorage.getItem("elb_consent") === "granted") {
+      gtag("consent", "update", {
+        ad_storage: "granted",
+        ad_user_data: "granted",
+        ad_personalization: "granted",
+        analytics_storage: "granted"
+      });
+    }
+  } catch (e) { /* private mode, storage blocked */ }
 </script>
 {% endif %}
 
