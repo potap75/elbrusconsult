@@ -144,6 +144,22 @@ def test_home_includes_advisory_phone_link():
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize("url_name", ["home", "about"])
+def test_toptal_badge_renders_on_home_and_about(url_name):
+    """The Toptal "Top 3% Talent" badge partial must render on both pages,
+    exactly once (its wrapper carries id="r", so double inclusion would emit
+    a duplicate id)."""
+    client = Client()
+    response = client.get(reverse(url_name))
+    assert response.status_code == 200
+    body = response.content.decode("utf-8")
+    assert body.count('<div id=r>') == 1
+    assert "TOP 3% TALENT" in body
+    assert "https://use.typekit.net/kmj5qkr.css" in body
+    assert "https://www.toptal.com/developers/resume/roman-potapov#ddwn5b" in body
+
+
+@pytest.mark.django_db
 def test_organization_jsonld_includes_advisory_phone():
     client = Client()
     response = client.get(reverse("home"))
