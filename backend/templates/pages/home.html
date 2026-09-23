@@ -14,26 +14,32 @@
     <div class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-slate-50/15"
          aria-hidden="true"></div>
 
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
-      <p class="text-aurora-300 text-sm font-semibold uppercase tracking-[0.2em]">{{ SITE_NAME }}</p>
-      <h1 class="mt-3 font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-        Cloud engineering &amp; cybersecurity, delivered with <span class="bg-gradient-to-r from-aurora-300 via-aurora-400 to-aurora-500 bg-clip-text text-transparent">peak precision</span>.
-      </h1>
-      <p class="mt-6 max-w-2xl text-lg text-summit-100">
-        We help organizations design secure cloud architectures, harden their controls,
-        and respond to threats. Two decades of experience across financial services,
-        healthcare, manufacturing, and communications.
-      </p>
-      <div class="mt-10 flex flex-wrap gap-4">
-        <a href="{% url 'schedule' %}"
-           class="inline-flex items-center rounded-md bg-white px-5 py-3 text-summit-800 font-semibold shadow hover:bg-slate-100">
-          Schedule an evaluation
-        </a>
-        <a href="{% url 'services-list' %}"
-           class="inline-flex items-center rounded-md border border-white/30 px-5 py-3 font-semibold hover:bg-white/10">
-          Explore services
-        </a>
-        {% include "partials/_advisory_phone.html" with variant="hero" %}
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 lg:py-32 lg:flex lg:items-center lg:justify-between lg:gap-16">
+      <div>
+        <p class="text-aurora-300 text-sm font-semibold uppercase tracking-[0.2em]">{{ SITE_NAME }}</p>
+        <h1 class="mt-3 font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
+          Cloud engineering &amp; cybersecurity, delivered with <span class="bg-gradient-to-r from-aurora-300 via-aurora-400 to-aurora-500 bg-clip-text text-transparent">peak precision</span>.
+        </h1>
+        <p class="mt-6 max-w-2xl text-lg text-summit-100">
+          We help organizations design secure cloud architectures, harden their controls,
+          and respond to threats. Two decades of experience across financial services,
+          healthcare, manufacturing, and communications.
+        </p>
+        <div class="mt-10 flex flex-wrap gap-4">
+          <a href="{% url 'schedule' %}"
+             class="inline-flex items-center rounded-md bg-white px-5 py-3 text-summit-800 font-semibold shadow hover:bg-slate-100">
+            Schedule an evaluation
+          </a>
+          <a href="{% url 'services-list' %}"
+             class="inline-flex items-center rounded-md border border-white/30 px-5 py-3 font-semibold hover:bg-white/10">
+            Explore services
+          </a>
+          {% include "partials/_advisory_phone.html" with variant="hero" %}
+        </div>
+      </div>
+      {# Toptal trust badge — anchors the hero's right column on desktop. #}
+      <div class="mt-14 flex justify-center lg:mt-0 lg:shrink-0">
+        {% include "partials/_toptal_badge.html" %}
       </div>
     </div>
   </section>

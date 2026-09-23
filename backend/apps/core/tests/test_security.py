@@ -81,6 +81,16 @@ def test_homepage_emits_all_security_headers():
     # must be allow-listed or the typography silently falls back to system.
     assert "fonts.googleapis.com" in csp
     assert "fonts.gstatic.com" in csp
+    # Adobe Fonts / Typekit backs the Toptal badge (proxima-nova): the badge's
+    # inline <style> @imports the kit CSS from use.typekit.net, which itself
+    # @imports a tracking stylesheet from p.typekit.net (both style-src) and
+    # loads the font binaries from use.typekit.net (font-src). Without these
+    # entries the badge silently falls back to Arial.
+    style_src = csp[csp.index("style-src") : csp.index(";", csp.index("style-src"))]
+    assert " https://use.typekit.net" in style_src
+    assert " https://p.typekit.net" in style_src
+    font_src = csp[csp.index("font-src") : csp.index(";", csp.index("font-src"))]
+    assert " https://use.typekit.net" in font_src
 
     assert response.headers["X-Frame-Options"] == "DENY"
     assert response.headers["X-Content-Type-Options"] == "nosniff"

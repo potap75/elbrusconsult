@@ -128,8 +128,22 @@ _FRAME_SRC_VENDORS = (
 # actual .woff2 files from fonts.gstatic.com (font-src). Both endpoints are
 # CORS-friendly and HTTPS-only; they are not user-content surfaces, so the
 # scope here stays narrow.
-_STYLE_SRC_VENDORS = ("https://fonts.googleapis.com",)
-_FONT_SRC_VENDORS = ("https://fonts.gstatic.com",)
+#
+# Adobe Fonts (Typekit) backs the Toptal badge partial
+# (templates/partials/_toptal_badge.html): its inline <style> does
+# @import https://use.typekit.net/kmj5qkr.css, which in turn @imports a
+# tracking stylesheet from p.typekit.net and declares proxima-nova
+# @font-face sources on use.typekit.net. Both @imports are governed by
+# style-src; the font binaries by font-src.
+_STYLE_SRC_VENDORS = (
+    "https://fonts.googleapis.com",
+    "https://use.typekit.net",
+    "https://p.typekit.net",
+)
+_FONT_SRC_VENDORS = (
+    "https://fonts.gstatic.com",
+    "https://use.typekit.net",
+)
 
 _PERMISSIONS_POLICY = ", ".join(
     [

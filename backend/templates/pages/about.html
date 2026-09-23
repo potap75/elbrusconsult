@@ -43,7 +43,8 @@
         </article>
       </div>
 
-      <article class="prose prose-slate mt-16 max-w-3xl" data-reveal="card">
+      <div class="mt-16 flex flex-col-reverse items-center gap-12 lg:flex-row lg:items-start lg:gap-16">
+      <article class="prose prose-slate max-w-3xl" data-reveal="card">
         <p class="lead">
           {{ SITE_NAME }} is a boutique firm of cloud and cybersecurity consultants. Our team
           evaluates your risk of a breach and designs optimal controls tailored to your needs.
@@ -77,6 +78,11 @@
           running. Done right, it&rsquo;s not a tax on the business &mdash; it&rsquo;s an enabler.
         </blockquote>
       </article>
+      {# Toptal trust badge — sits beside the intro copy on desktop, above it on mobile. #}
+      <div class="shrink-0 pt-2" data-reveal="card">
+        {% include "partials/_toptal_badge.html" %}
+      </div>
+      </div>
 
       <div class="mt-12 flex flex-wrap gap-4" data-reveal="card">
         <a href="{% url 'services-list' %}"
